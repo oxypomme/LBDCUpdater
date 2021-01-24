@@ -6,4 +6,14 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="res\forge.png" />
+    <None Remove="res\synchro.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="res\forge.png" />
+    <Resource Include="res\synchro.png" />
+  </ItemGroup>
+
 </Project>

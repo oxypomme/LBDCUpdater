@@ -5,8 +5,33 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LBDCUpdater"
         mc:Ignorable="d"
-        Title="LBDC MC Updater" Height="450" Width="800">
+        SizeToContent="WidthAndHeight"
+        MinWidth="300"
+        Title="LBDC MC Updater">
     <StackPanel>
-        <Button Content="Mettre à jour" />
+        <Button>
+            <StackPanel Orientation="Horizontal">
+                <Image Source="/res/synchro.png" Width="16" />
+                <TextBlock Padding="5">Mettre à jour</TextBlock>
+            </StackPanel>
+        </Button>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/res/forge.png" Width="16" />
+                    <TextBlock Padding="5">Télécharger Forge</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="1" IsEnabled="False">
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="16" />
+                    <TextBlock Padding="5">Site Web</TextBlock>
+                </StackPanel>
+            </Button>
+        </Grid>
     </StackPanel>
 </Window>
