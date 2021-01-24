@@ -20,7 +20,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0">
+            <Button Grid.Column="0" Click="Forge_Click">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/res/forge.png" Width="16" />
                     <TextBlock Padding="5">Télécharger Forge</TextBlock>

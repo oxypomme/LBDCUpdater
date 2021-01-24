@@ -24,5 +24,8 @@ namespace LBDCUpdater
         {
             InitializeComponent();
         }
+
+        // TODO: Mettre le lien de téléchargement de la bonne version de forge
+        private void Forge_Click(object sender, RoutedEventArgs e) => System.Diagnostics.Process.Start("http://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.12.2.html");
     }
 }
