@@ -5,21 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LBDCUpdater"
         mc:Ignorable="d"
-        SizeToContent="WidthAndHeight"
-        MinWidth="200"
+        SizeToContent="Width"
+        MinWidth="400"
         Title="Mods Optionnels">
     <StackPanel>
-        <ListBox>
-            <d:ListBoxItem>
-                <CheckBox>Dummy</CheckBox>
-            </d:ListBoxItem>
-            <d:ListBoxItem>
-                <CheckBox>Dummy</CheckBox>
-            </d:ListBoxItem>
-            <d:ListBoxItem>
-                <CheckBox>Dummy</CheckBox>
-            </d:ListBoxItem>
+        <ListBox MaxHeight="360" HorizontalContentAlignment="Stretch">
+            <local:ClientSideMod Title="MonMod" Description="Un super mod" Icon="res/forge.png" Image="res/forge.png" />
+            <local:ClientSideMod Title="MonMod" Description="Un super mod" Icon="res/forge.png" />
+            <local:ClientSideMod Title="MonMod" Description="Un super mod" IsChecked="True" />
+            <local:ClientSideMod Title="MonMod" />
         </ListBox>
-        <Button>Continuer</Button>
+        <Button Height="40">Continuer</Button>
     </StackPanel>
 </Window>

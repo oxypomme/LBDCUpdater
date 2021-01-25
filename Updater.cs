@@ -17,8 +17,8 @@ namespace LBDCUpdater
         {
             try
             {
-                var github = new Octokit.GitHubClient(new Octokit.ProductHeaderValue("DofLog"));
-                var lastRelease = await github.Repository.Release.GetLatest(270258000);
+                var github = new Octokit.GitHubClient(new Octokit.ProductHeaderValue("LBDCUpdater"));
+                var lastRelease = await github.Repository.Release.GetLatest(332078429);
                 var current = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
                 if (new Version(lastRelease.TagName) > current)
                 {
@@ -26,14 +26,14 @@ namespace LBDCUpdater
                     if (result == MessageBoxResult.Yes)
                     {
                         WebClient webClient = new WebClient();
-                        webClient.DownloadFile(new Uri("https://github.com/oxypomme/LBDCUpdater/releases/latest/download/LBDCUpdater.exe"), "NewLBDCUpdater.exe");
-                        //TODO: Finir updater
+                        webClient.DownloadFile(new Uri("https://github.com/oxypomme/LBDCUpdater/releases/latest/download/LBDCUpdater.exe"), "LBDCUpdater_new.exe");
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("cmd.exe /k echo \"Mise à jour en cours...\" timeout 5 > NUL && move LBDCUpdater_new.exe LBDCUpdater.exe"));
                         Environment.Exit(0);
                     }
                 }
                 else if (new Version(lastRelease.TagName) < current)
                 {
-                    var result = MessageBox.Show("Cette version de DofLog est expérimentale : de nombreux bugs peuvent survenir et les nouvelles fonctionnalités peuvent ne pas être prêtes à l'utilisation. Voulez-vous continuer ?", "Updater", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Yes);
+                    var result = MessageBox.Show("Cette version du logiciel est expérimentale : de nombreux bugs peuvent survenir et les nouvelles fonctionnalités peuvent ne pas être prêtes à l'utilisation. Voulez-vous continuer ?", "Updater", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Yes);
                     if (result == MessageBoxResult.No)
                     {
                         Environment.Exit(1);
