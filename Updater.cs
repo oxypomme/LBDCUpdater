@@ -17,17 +17,22 @@ namespace LBDCUpdater
         {
             try
             {
+                App.LogStream.Log(new("Checking updates..."));
                 var github = new Octokit.GitHubClient(new Octokit.ProductHeaderValue("LBDCUpdater"));
                 var lastRelease = await github.Repository.Release.GetLatest(332078429);
                 var current = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+                App.LogStream.Log(new($"Versions : Current = {current}, Latest = {lastRelease.TagName}"));
                 if (new Version(lastRelease.TagName) > current)
                 {
                     var result = MessageBox.Show("Une nouvelle version du logiciel est disponible. Voulez-vous la télécharger ?", "Updater", MessageBoxButton.YesNo, MessageBoxImage.Information);
                     if (result == MessageBoxResult.Yes)
                     {
                         WebClient webClient = new WebClient();
+                        App.LogStream.Log(new("Downloading update..."));
                         webClient.DownloadFile(new Uri("https://github.com/oxypomme/LBDCUpdater/releases/latest/download/LBDCUpdater.exe"), "LBDCUpdater_new.exe");
-                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("cmd.exe /k echo \"Mise à jour en cours...\" timeout 5 > NUL && move LBDCUpdater_new.exe LBDCUpdater.exe"));
+                        App.LogStream.Log(new("Installing update..."));
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("cmd.exe /k echo \"Mise à jour en cours...\" timeout 5 > NUL && move LBDCUpdater_new.exe LBDCUpdater.exe && LBDCUpdater.exe"));
+                        App.LogStream.Log(new("Restarting..."));
                         Environment.Exit(0);
                     }
                 }
@@ -40,7 +45,7 @@ namespace LBDCUpdater
                     }
                 }
             }
-            catch (Exception e) { }
+            catch (Exception e) { App.LogStream.Log(new(e.ToString(), LogSeverity.Error, e)); }
         }
     }
 }
