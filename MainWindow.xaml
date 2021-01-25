@@ -20,7 +20,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <ContentControl Grid.ColumnSpan="2" x:Name="infoControl" />
+        <local:InstallationWarning Grid.ColumnSpan="2" x:Name="infoControl" />
         <Button Grid.ColumnSpan="2" Grid.Row="1">
             <StackPanel Orientation="Horizontal">
                 <Image Source="/res/synchro.png" Width="16" />

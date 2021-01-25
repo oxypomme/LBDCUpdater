@@ -20,14 +20,9 @@ namespace LBDCUpdater
     /// </summary>
     public partial class InstallationWarning : UserControl
     {
-        private readonly Action onClick;
-
-        public InstallationWarning(Action a)
+        public InstallationWarning()
         {
             InitializeComponent();
-            onClick = a;
         }
-
-        private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) => onClick();
     }
 }

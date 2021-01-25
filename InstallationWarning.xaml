@@ -6,10 +6,10 @@
              xmlns:local="clr-namespace:LBDCUpdater"
              mc:Ignorable="d"
              MinHeight="30" d:DesignWidth="300">
-    <Grid Background="#FFFF6902" Cursor="Hand" MouseLeftButtonDown="Grid_MouseLeftButtonDown">
-            <Image Height="25" Source="/warning.png" Margin="10,0" HorizontalAlignment="Left" />
-            <TextBlock Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40,5,5,5" TextWrapping="Wrap">
+    <Grid Background="#FFFF6902" Cursor="Hand">
+        <Image Height="25" Source="/warning.png" Margin="10,0" HorizontalAlignment="Left" />
+        <TextBlock Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40,5,5,5" TextWrapping="Wrap">
             Attention, des mods installés sont en trop, cliquer pour choisir l'action à réaliser.
-            </TextBlock>
+        </TextBlock>
     </Grid>
 </UserControl>

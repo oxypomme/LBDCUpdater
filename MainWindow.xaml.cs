@@ -24,7 +24,6 @@ namespace LBDCUpdater
         public MainWindow()
         {
             InitializeComponent();
-            infoControl.Content = new InstallationWarning(() => MessageBox.Show("test"));
         }
 
         private void Forge_Click(object sender, RoutedEventArgs e)
