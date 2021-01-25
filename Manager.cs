@@ -64,10 +64,12 @@ namespace LBDCUpdater
             SaveBlacklist();
         }
 
-        public async Task DownloadMissingAsync(Action<string, int, int>? listProgress, Action<long, long>? dataProgress)
+        public async Task DownloadMissingAsync(Action<string, int, int>? listProgress, Action<long, long>? dataProgress, EventHandler cancelEvent)
         {
             int count = MissingMods.Count();
             int modNb = 1;
+            bool abort = false;
+            cancelEvent += (sender, e) => abort = true;
             foreach (var mod in MissingMods)
             {
                 listProgress?.Invoke(mod.ModName, modNb, count);
@@ -77,6 +79,12 @@ namespace LBDCUpdater
                 long writtenBytes = 0;
                 while (writtenBytes < size)
                 {
+                    if (abort)
+                    {
+                        localFile.Close();
+                        File.Delete(Path.Combine(ModsFolder, mod.ModName));
+                        return;
+                    }
                     byte[] bytes = new byte[1024];
                     int written = await serverFile.ReadAsync(bytes.AsMemory(0, 1024));
                     localFile.Write(bytes, 0, written);
@@ -90,14 +98,22 @@ namespace LBDCUpdater
             await CheckModsAsync();
         }
 
-        public async Task DownloadOptionalAsync(OptionalMod mod, Action<long, long>? dataProgress)
+        public async Task DownloadOptionalAsync(OptionalMod mod, Action<long, long>? dataProgress, EventHandler cancelEvent)
         {
             using var localFile = new BufferedStream(new FileStream(Path.Combine(ModsFolder, mod.ModName), FileMode.Create, FileAccess.Write), 1024 << 5);
             long size = await Task.Run(() => client.Get($"/home/mcftp/server2/mods/{mod.ModName}").Length);
             using var serverFile = await Task.Run(() => client.OpenRead($"/home/mcftp/server2/mods/{mod.ModName}"));
             long writtenBytes = 0;
+            bool abort = false;
+            cancelEvent += (sender, e) => abort = true;
             while (writtenBytes < size)
             {
+                if (abort)
+                {
+                    localFile.Close();
+                    File.Delete(Path.Combine(ModsFolder, mod.ModName));
+                    return;
+                }
                 byte[] bytes = new byte[1024];
                 int written = await serverFile.ReadAsync(bytes.AsMemory(0, 1024));
                 localFile.Write(bytes, 0, written);
