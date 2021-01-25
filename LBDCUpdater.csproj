@@ -9,20 +9,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="error.png" />
     <None Remove="res\forge.png" />
     <None Remove="res\synchro.png" />
+    <None Remove="validate.png" />
     <None Remove="warning.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentFTP" Version="33.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Octokit" Version="0.48.0" />
+    <PackageReference Include="SSH.NET" Version="2020.0.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="error.png" />
     <Resource Include="res\forge.png" />
     <Resource Include="res\synchro.png" />
+    <Resource Include="validate.png" />
     <Resource Include="warning.png" />
   </ItemGroup>
 

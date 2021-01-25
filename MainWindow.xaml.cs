@@ -23,21 +23,29 @@ namespace LBDCUpdater
     {
         public MainWindow()
         {
-            InitializeComponent();
             Manager = new Manager();
-            infoControl.MouseLeftButtonDown += async (sender, e) => await Manager.InitAsync();
+            InitializeComponent();
         }
 
         private Manager Manager { get; }
 
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+        }
+
         private void Forge_Click(object sender, RoutedEventArgs e)
-            => new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    UseShellExecute = true,
-                    FileName = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/1.12.2-14.23.5.2854/forge-1.12.2-14.23.5.2854-installer.jar"
-                }
-            }.Start();
+                    => new Process
+                    {
+                        StartInfo = new ProcessStartInfo
+                        {
+                            UseShellExecute = true,
+                            FileName = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/1.12.2-14.23.5.2854/forge-1.12.2-14.23.5.2854-installer.jar"
+                        }
+                    }.Start();
+
+        private async void Window_Initialized(object sender, EventArgs e)
+        {
+            await Manager.InitAsync();
+        }
     }
 }
