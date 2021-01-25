@@ -13,11 +13,10 @@ namespace LBDCUpdater
     /// </summary>
     public partial class App : Application
     {
-        internal static LogStream LogStream;
+        internal static LogStream LogStream = new LogStream("latest.log");
 
         private App()
         {
-            LogStream = new LogStream("logs.txt");
             LogStream.Log(new("Hello world !"));
             Updater.CheckUpdates();
         }
