@@ -24,9 +24,17 @@ namespace LBDCUpdater
         public MainWindow()
         {
             InitializeComponent();
+            infoControl.Content = new InstallationWarning(() => MessageBox.Show("test"));
         }
 
-        // TODO: Mettre le lien de téléchargement de la bonne version de forge
-        private void Forge_Click(object sender, RoutedEventArgs e) => System.Diagnostics.Process.Start("http://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.12.2.html");
+        private void Forge_Click(object sender, RoutedEventArgs e)
+            => new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    UseShellExecute = true,
+                    FileName = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/1.12.2-14.23.5.2854/forge-1.12.2-14.23.5.2854-installer.jar"
+                }
+            }.Start();
     }
 }
