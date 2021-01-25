@@ -5,15 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LBDCUpdater"
         mc:Ignorable="d"
-        Width="250"
+        Width="350"
         SizeToContent="Height"
-        Title="Downloading">
+        Title="Downloading" Closed="Window_Closed">
     <StackPanel>
-        <Label HorizontalAlignment="Center" d:Content="24/144 (16%)" />
-        <ProgressBar Height="12" />
-        <Label HorizontalAlignment="Center" d:Content="mod-version-forge.jar (1.24/4.86 Mo)" />
-        <ProgressBar Height="12" />
+        <Label Name="globalProgressionText" HorizontalAlignment="Center" d:Content="24/144 (16%)" />
+        <ProgressBar Height="12" Name="globalProgressionBar" />
+        <Label HorizontalAlignment="Center" Name="fileProgressionText" d:Content="mod-version-forge.jar (1.24/4.86 Mo)" />
+        <ProgressBar Height="12" Name="fileProgressionBar" />
         <Separator />
-        <Button Content="Annuler" />
+        <Button Content="Annuler" Click="Button_Click" />
     </StackPanel>
 </Window>

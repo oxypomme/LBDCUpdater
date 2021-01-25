@@ -64,12 +64,10 @@ namespace LBDCUpdater
             SaveBlacklist();
         }
 
-        public async Task DownloadMissingAsync(Action<string, int, int>? listProgress, Action<long, long>? dataProgress, EventHandler cancelEvent)
+        public async Task DownloadMissingAsync(Action<string, int, int>? listProgress, Action<string, long, long>? dataProgress, CancellationToken token)
         {
             int count = MissingMods.Count();
             int modNb = 1;
-            bool abort = false;
-            cancelEvent += (sender, e) => abort = true;
             foreach (var mod in MissingMods)
             {
                 listProgress?.Invoke(mod.ModName, modNb, count);
@@ -79,33 +77,33 @@ namespace LBDCUpdater
                 long writtenBytes = 0;
                 while (writtenBytes < size)
                 {
-                    if (abort)
+                    if (token.IsCancellationRequested)
                     {
                         localFile.Close();
                         File.Delete(Path.Combine(ModsFolder, mod.ModName));
+                        CheckMods();
                         return;
                     }
                     byte[] bytes = new byte[1024];
                     int written = await serverFile.ReadAsync(bytes.AsMemory(0, 1024));
                     localFile.Write(bytes, 0, written);
                     writtenBytes += written;
-                    dataProgress?.Invoke(writtenBytes, size);
+                    dataProgress?.Invoke(mod.ModName, writtenBytes, size);
                 }
                 localFile.Flush();
                 modNb++;
             }
-            await RefreshAsync();
-            await CheckModsAsync();
+            CheckMods();
         }
 
-        public async Task DownloadOptionalAsync(OptionalMod mod, Action<long, long>? dataProgress, EventHandler cancelEvent)
+        public async Task DownloadOptionalAsync(OptionalMod mod, Action<long, long>? dataProgress, Action? cancelEvent)
         {
             using var localFile = new BufferedStream(new FileStream(Path.Combine(ModsFolder, mod.ModName), FileMode.Create, FileAccess.Write), 1024 << 5);
             long size = await Task.Run(() => client.Get($"/home/mcftp/server2/mods/{mod.ModName}").Length);
             using var serverFile = await Task.Run(() => client.OpenRead($"/home/mcftp/server2/mods/{mod.ModName}"));
             long writtenBytes = 0;
             bool abort = false;
-            cancelEvent += (sender, e) => abort = true;
+            cancelEvent += () => abort = true;
             while (writtenBytes < size)
             {
                 if (abort)
@@ -128,7 +126,7 @@ namespace LBDCUpdater
         {
             await Task.Run(client.Connect);
             await RefreshAsync();
-            await CheckModsAsync();
+            CheckMods();
         }
 
         public void RemoveBlacklist(string modname)
@@ -152,7 +150,7 @@ namespace LBDCUpdater
             mod.Installed = false;
         }
 
-        private async Task CheckModsAsync()
+        private void CheckMods()
         {
             var localMods = Directory.GetFiles(ModsFolder);
             var list = new LinkedList<Mod>();
@@ -161,12 +159,7 @@ namespace LBDCUpdater
             {
                 if (m is OptionalMod om)
                     om.Installed = localMods.Any(name => name == m.ModName);
-                if (localMods.Contains(m.ModName))
-                {
-                    if (new FileInfo(Path.Combine(ModsFolder, m.ModName)).Length != await Task.Run(() => client.Get($"/home/mcftp/server2/mods/{m.ModName}").Length))
-                        list.AddLast(m);
-                }
-                else
+                if (!localMods.Contains(m.ModName))
                     list.AddLast(m);
             }
             LocalMods = (from name in localMods where AllMods.All(m => m.ModName != name) select (name, blacklist.Any(m => m == name))).ToList();
@@ -211,6 +204,11 @@ namespace LBDCUpdater
             foreach (var item in blacklist)
                 stream.WriteLine(item);
             stream.Flush();
+        }
+
+        public class DownloadCancelation
+        {
+            public Action? Cancel = null;
         }
 
         private class FtpMod

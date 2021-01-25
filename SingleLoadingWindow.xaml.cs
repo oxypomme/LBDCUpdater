@@ -15,22 +15,13 @@ using System.Windows.Shapes;
 namespace LBDCUpdater
 {
     /// <summary>
-    /// Logique d'interaction pour LoadingWindow.xaml
+    /// Logique d'interaction pour SingleLoadingWindow.xaml
     /// </summary>
-    public partial class LoadingWindow : Window
+    public partial class SingleLoadingWindow : Window
     {
-        public LoadingWindow()
+        public SingleLoadingWindow()
         {
             InitializeComponent();
-            Canceled = null;
         }
-
-        public event Action? Canceled;
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-         => Close();
-
-        private void Window_Closed(object sender, EventArgs e)
-         => Canceled?.Invoke();
     }
 }
