@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="LBDCUpdater.InstallationWarning"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:LBDCUpdater"
+             mc:Ignorable="d"
+             MinHeight="30" d:DesignWidth="300">
+    <Grid Background="#FFFF6902" Cursor="Hand" MouseLeftButtonDown="Grid_MouseLeftButtonDown">
+            <Image Height="25" Source="/warning.png" Margin="10,0" HorizontalAlignment="Left" />
+            <TextBlock Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40,5,5,5" TextWrapping="Wrap">
+            Attention, des mods installés sont en trop, cliquer pour choisir l'action à réaliser.
+            </TextBlock>
+    </Grid>
+</UserControl>
