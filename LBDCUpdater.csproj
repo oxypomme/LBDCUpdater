@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Octokit" Version="0.48.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="res\forge.png" />
     <Resource Include="res\synchro.png" />
   </ItemGroup>
