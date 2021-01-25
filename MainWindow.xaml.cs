@@ -24,7 +24,11 @@ namespace LBDCUpdater
         public MainWindow()
         {
             InitializeComponent();
+            Manager = new Manager();
+            infoControl.MouseLeftButtonDown += async (sender, e) => await Manager.InitAsync();
         }
+
+        private Manager Manager { get; }
 
         private void Forge_Click(object sender, RoutedEventArgs e)
             => new Process
