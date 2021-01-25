@@ -81,11 +81,11 @@ namespace LBDCUpdater
                     {
                         localFile.Close();
                         File.Delete(Path.Combine(ModsFolder, mod.ModName));
-                        CheckMods();
+                        await CheckModsAsync();
                         return;
                     }
-                    byte[] bytes = new byte[1024];
-                    int written = await serverFile.ReadAsync(bytes.AsMemory(0, 1024));
+                    byte[] bytes = new byte[1024 << 2];
+                    int written = await serverFile.ReadAsync(bytes.AsMemory(0, 1024 << 2));
                     localFile.Write(bytes, 0, written);
                     writtenBytes += written;
                     dataProgress?.Invoke(mod.ModName, writtenBytes, size);
@@ -93,7 +93,7 @@ namespace LBDCUpdater
                 localFile.Flush();
                 modNb++;
             }
-            CheckMods();
+            await CheckModsAsync();
         }
 
         public async Task DownloadOptionalAsync(OptionalMod mod, Action<long, long>? dataProgress, Action? cancelEvent)
@@ -112,8 +112,8 @@ namespace LBDCUpdater
                     File.Delete(Path.Combine(ModsFolder, mod.ModName));
                     return;
                 }
-                byte[] bytes = new byte[1024];
-                int written = await serverFile.ReadAsync(bytes.AsMemory(0, 1024));
+                byte[] bytes = new byte[1024 << 2];
+                int written = await serverFile.ReadAsync(bytes.AsMemory(0, 1024 << 2));
                 localFile.Write(bytes, 0, written);
                 writtenBytes += written;
                 dataProgress?.Invoke(writtenBytes, size);
@@ -126,7 +126,7 @@ namespace LBDCUpdater
         {
             await Task.Run(client.Connect);
             await RefreshAsync();
-            CheckMods();
+            await CheckModsAsync();
         }
 
         public void RemoveBlacklist(string modname)
@@ -150,16 +150,21 @@ namespace LBDCUpdater
             mod.Installed = false;
         }
 
-        private void CheckMods()
+        private async Task CheckModsAsync()
         {
-            var localMods = Directory.GetFiles(ModsFolder);
+            var localMods = from file in Directory.GetFiles(ModsFolder) select Path.GetFileName(file);
             var list = new LinkedList<Mod>();
             MissingMods = list;
             foreach (var m in AllMods)
             {
                 if (m is OptionalMod om)
                     om.Installed = localMods.Any(name => name == m.ModName);
-                if (!localMods.Contains(m.ModName))
+                if (localMods.Contains(m.ModName))
+                {
+                    if (new FileInfo(Path.Combine(ModsFolder, m.ModName)).Length != await Task.Run(() => client.Get($"/home/mcftp/server2/mods/{m.ModName}").Length))
+                        list.AddLast(m);
+                }
+                else
                     list.AddLast(m);
             }
             LocalMods = (from name in localMods where AllMods.All(m => m.ModName != name) select (name, blacklist.Any(m => m == name))).ToList();

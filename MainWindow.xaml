@@ -9,7 +9,7 @@
         MinHeight="100"
         MinWidth="250"
         Width="500"
-        Title="LBDC MC Updater" Initialized="Window_Initialized">
+        Title="LBDC MC Updater" Initialized="Window_Initialized" IsEnabled="False">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />

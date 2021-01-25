@@ -43,6 +43,7 @@ namespace LBDCUpdater
                     {
                         dialog.globalProgressionText.Content = $"{n}/{max} ({n * 100 / max}%)";
                         dialog.globalProgressionBar.Value = n * 100 / max;
+                        App.LogStream.Log(new($"Downloading {mod}...", LogSeverity.Info));
                     }),
                 (mod, current, max) =>
                     Dispatcher.Invoke(() =>
@@ -67,7 +68,10 @@ namespace LBDCUpdater
 
         private async void Window_Initialized(object sender, EventArgs e)
         {
+            App.LogStream.Log(new("Analizing missing files...", LogSeverity.Info));
             await Manager.InitAsync();
+            App.LogStream.Log(new($"Found {Manager.MissingMods.Count()} missing mods.", LogSeverity.Info));
+            IsEnabled = true;
         }
     }
 }
