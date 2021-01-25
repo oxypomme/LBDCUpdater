@@ -66,4 +66,3 @@ namespace LBDCUpdater
         public void WriteLine(LogMessage value) => Log(value);
     }
 }
-}
