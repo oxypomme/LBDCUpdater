@@ -9,7 +9,7 @@
         MinWidth="400"
         Title="Mods Optionnels">
     <StackPanel>
-        <ListBox MaxHeight="360">
+        <ListBox MaxHeight="360" HorizontalContentAlignment="Stretch">
             <local:ClientSideMod Title="MonMod" Description="Un super mod" Icon="res/forge.png" Image="res/forge.png" />
             <local:ClientSideMod Title="MonMod" Description="Un super mod" Icon="res/forge.png" />
             <local:ClientSideMod Title="MonMod" Description="Un super mod" IsChecked="True" />
