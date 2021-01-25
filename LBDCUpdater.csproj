@@ -10,11 +10,13 @@
   <ItemGroup>
     <None Remove="res\forge.png" />
     <None Remove="res\synchro.png" />
+    <None Remove="warning.png" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="res\forge.png" />
     <Resource Include="res\synchro.png" />
+    <Resource Include="warning.png" />
   </ItemGroup>
 
 </Project>
