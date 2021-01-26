@@ -11,6 +11,7 @@
   <ItemGroup>
     <None Remove="error.png" />
     <None Remove="res\client.png" />
+    <None Remove="res\deleteMods.png" />
     <None Remove="res\forge.png" />
     <None Remove="res\info.png" />
     <None Remove="res\synchro.png" />
@@ -26,6 +27,7 @@
 
   <ItemGroup>
     <Resource Include="res\client.png" />
+    <Resource Include="res\deleteMods.png" />
     <Resource Include="res\error.png" />
     <Resource Include="res\forge.png" />
     <Resource Include="res\info.png" />

@@ -65,6 +65,11 @@ namespace LBDCUpdater
             //TODO mods optionels
         }
 
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            DisplayBlacklist();
+        }
+
         private void CheckProblems()
         {
             var missing = Manager.MissingMods.Count();
@@ -81,7 +86,7 @@ namespace LBDCUpdater
             {
                 infoControl.Mode = InstallationInfo.DisplayMode.WARNING;
                 infoControl.Text = conflicts == 1 ? $"{conflicts} mod est en trop. Cliquez pour choisir l'action à réaliser." : $"{missing} mods sont en trop. Cliquez pour choisir l'action à réaliser.";
-                infoControl.Click = null; //TODO lier à la blacklist
+                infoControl.Click = DisplayBlacklist;
                 infoControl.Clickable = true;
                 return;
             }
@@ -91,15 +96,22 @@ namespace LBDCUpdater
             infoControl.Clickable = false;
         }
 
+        private void DisplayBlacklist()
+        {
+            var dialog = new Blacklist();
+            dialog.Owner = this;
+            dialog.ShowDialog();
+        }
+
         private void Forge_Click(object sender, RoutedEventArgs e)
-                        => new Process
-                        {
-                            StartInfo = new ProcessStartInfo
-                            {
-                                UseShellExecute = true,
-                                FileName = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/1.12.2-14.23.5.2854/forge-1.12.2-14.23.5.2854-installer.jar"
-                            }
-                        }.Start();
+                                => new Process
+                                {
+                                    StartInfo = new ProcessStartInfo
+                                    {
+                                        UseShellExecute = true,
+                                        FileName = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/1.12.2-14.23.5.2854/forge-1.12.2-14.23.5.2854-installer.jar"
+                                    }
+                                }.Start();
 
         private async void Window_Initialized(object sender, EventArgs e)
         {
