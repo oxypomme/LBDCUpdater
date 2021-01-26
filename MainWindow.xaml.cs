@@ -24,7 +24,11 @@ namespace LBDCUpdater
     {
         public MainWindow()
         {
-            Manager = new Manager();
+            try
+            {
+                Manager = new Manager();
+            }
+            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
             InitializeComponent();
         }
 
@@ -32,46 +36,61 @@ namespace LBDCUpdater
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new LoadingWindow();
-            dialog.Owner = this;
-            var ts = new CancellationTokenSource();
-            CancellationToken ct = ts.Token;
-            dialog.Canceled += ts.Cancel;
-            var t = Manager.DownloadMissingAsync(
-                (mod, n, max) =>
-                    Dispatcher.Invoke(() =>
-                    {
-                        dialog.globalProgressionText.Content = $"{n}/{max} ({n * 100 / max}%)";
-                        dialog.globalProgressionBar.Value = n * 100 / max;
-                        App.LogStream.Log(new($"Downloading {mod}...", LogSeverity.Info));
-                    }),
-                (mod, current, max) =>
-                    Dispatcher.Invoke(() =>
-                    {
-                        dialog.fileProgressionText.Content = $"{mod} ({current >> 10} / {max >> 10} Ko)";
-                        dialog.fileProgressionBar.Value = (current >> 10) * 100 / (max >> 10);
-                    }), ct).ContinueWith(t => Dispatcher.Invoke(dialog.Close));
+            try
+            {
+                var dialog = new LoadingWindow();
+                dialog.Owner = this;
+                var ts = new CancellationTokenSource();
+                CancellationToken ct = ts.Token;
+                dialog.Canceled += ts.Cancel;
+                var t = Manager.DownloadMissingAsync(
+                    (mod, n, max) =>
+                        Dispatcher.Invoke(() =>
+                        {
+                            dialog.globalProgressionText.Content = $"{n}/{max} ({n * 100 / max}%)";
+                            dialog.globalProgressionBar.Value = n * 100 / max;
+                            App.LogStream.Log(new($"Downloading {mod}..."));
+                        }),
+                    (mod, current, max) =>
+                        Dispatcher.Invoke(() =>
+                        {
+                            dialog.fileProgressionText.Content = $"{mod} ({current >> 10} / {max >> 10} Ko)";
+                            dialog.fileProgressionBar.Value = (current >> 10) * 100 / (max >> 10);
+                        }), ct
+                ).ContinueWith(t => Dispatcher.Invoke(dialog.Close));
 
-            dialog.ShowDialog();
-            await t;
+                dialog.ShowDialog();
+                await t;
+            }
+            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
         }
 
         private void Forge_Click(object sender, RoutedEventArgs e)
-                        => new Process
-                        {
-                            StartInfo = new ProcessStartInfo
-                            {
-                                UseShellExecute = true,
-                                FileName = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/1.12.2-14.23.5.2854/forge-1.12.2-14.23.5.2854-installer.jar"
-                            }
-                        }.Start();
+        {
+            try
+            {
+                new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        UseShellExecute = true,
+                        FileName = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/1.12.2-14.23.5.2854/forge-1.12.2-14.23.5.2854-installer.jar"
+                    }
+                }.Start();
+            }
+            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
+        }
 
         private async void Window_Initialized(object sender, EventArgs e)
         {
-            App.LogStream.Log(new("Analizing missing files...", LogSeverity.Info));
-            await Manager.InitAsync();
-            App.LogStream.Log(new($"Found {Manager.MissingMods.Count()} missing mods.", LogSeverity.Info));
-            IsEnabled = true;
+            try
+            {
+                App.LogStream.Log(new("Analizing missing files..."));
+                await Manager.InitAsync();
+                App.LogStream.Log(new($"Found {Manager.MissingMods.Count()} missing mods."));
+                IsEnabled = true;
+            }
+            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
         }
     }
 }

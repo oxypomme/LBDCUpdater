@@ -17,8 +17,11 @@ namespace LBDCUpdater
 
         private App()
         {
-            LogStream.Log(new("Hello world !"));
-            Updater.CheckUpdates();
+            try
+            {
+                Updater.CheckUpdates();
+            }
+            catch (Exception ex) { LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
         }
     }
 }
