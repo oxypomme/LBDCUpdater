@@ -17,11 +17,29 @@ namespace LBDCUpdater
     /// <summary>
     /// Logique d'interaction pour Window1.xaml
     /// </summary>
-    public partial class Window1 : Window
+    public partial class ClientSideInstallWindow : Window
     {
-        public Window1()
+        public ClientSideInstallWindow()
         {
             InitializeComponent();
+            InitializeModList();
+        }
+
+        private async void InitializeModList()
+        {
+            try
+            {
+                foreach (var optionalMod in App.Manager.OptionalMods)
+                    optionalListBox.Items.Add(
+                        new ClientSideMod(() => optionalMod.GetImageAsync())
+                        {
+                            Title = optionalMod.ModName,
+                            Description = optionalMod.Description,
+                            Icon = await optionalMod.GetIconAsync()
+                        }
+                    );
+            }
+            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
         }
     }
 }

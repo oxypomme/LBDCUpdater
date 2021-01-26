@@ -26,21 +26,21 @@ namespace LBDCUpdater
             set => SetValue(TitleProperty, value);
         }
 
-        public string Description
+        public string? Description
         {
-            get => (string)GetValue(DescriptionProperty);
+            get => (string?)GetValue(DescriptionProperty);
             set => SetValue(DescriptionProperty, value);
         }
 
-        public ImageSource Icon
+        public ImageSource? Icon
         {
-            get => (ImageSource)GetValue(IconProperty);
+            get => (ImageSource?)GetValue(IconProperty);
             set => SetValue(IconProperty, value);
         }
 
-        public ImageSource Image
+        private ImageSource? Image
         {
-            get => (ImageSource)GetValue(ImageProperty);
+            get => (ImageSource?)GetValue(ImageProperty);
             set => SetValue(ImageProperty, value);
         }
 
@@ -53,12 +53,24 @@ namespace LBDCUpdater
         public static readonly DependencyProperty TitleProperty = DependencyProperty.Register("Title", typeof(string), typeof(ClientSideMod));
         public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register("Description", typeof(string), typeof(ClientSideMod));
         public static readonly DependencyProperty IconProperty = DependencyProperty.Register("Icon", typeof(ImageSource), typeof(ClientSideMod));
-        public static readonly DependencyProperty ImageProperty = DependencyProperty.Register("Image", typeof(ImageSource), typeof(ClientSideMod));
+        private static readonly DependencyProperty ImageProperty = DependencyProperty.Register("Image", typeof(ImageSource), typeof(ClientSideMod));
         public static readonly DependencyProperty IsCheckedProperty = DependencyProperty.Register("IsChecked", typeof(bool), typeof(ClientSideMod));
 
-        public ClientSideMod()
+        private Func<Task<ImageSource?>> loadImage { get; set; }
+
+        public ClientSideMod(Func<Task<ImageSource?>> loadImageAction)
         {
             InitializeComponent();
+            this.loadImage = loadImageAction;
+        }
+
+        private async void CheckBox_ToolTipOpening(object sender, ToolTipEventArgs e)
+        {
+            try
+            {
+                Image = await loadImage.Invoke();
+            }
+            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
         }
     }
 }
