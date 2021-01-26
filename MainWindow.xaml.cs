@@ -44,7 +44,12 @@ namespace LBDCUpdater
                 var ts = new CancellationTokenSource();
                 CancellationToken ct = ts.Token;
                 dialog.Canceled += ts.Cancel;
-                var t = App.Manager.DownloadMissingAsync(
+                App.Manager.DeleteImageCache();
+                App.LogStream.Log(new LogMessage("Image cache deleted"));
+                var t1 = App.Manager.UpdateOfflineSkinAsync(ct).ContinueWith(t => App.LogStream.Log(new LogMessage("Offline skin config updated.")));
+                App.LogStream.Log(new LogMessage("Updating offline skin config..."));
+                App.LogStream.Log(new LogMessage("Updating mod files..."));
+                var t2 = App.Manager.DownloadMissingAsync(
                     (mod, n, max) =>
                         Dispatcher.Invoke(() =>
                         {
@@ -65,14 +70,15 @@ namespace LBDCUpdater
                                 dialog.fileProgressionBar.Value = (current >> 10) * 100 / (max >> 10);
                             }
                             catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
-                        }), ct).ContinueWith(t =>
-                        {
-                            Dispatcher.Invoke(dialog.Close);
-                            Dispatcher.Invoke(CheckProblems);
-                        });
-
+                        }), ct);
+                var globalTask = Task.WhenAll(t1, t2).ContinueWith(t =>
+                {
+                    Dispatcher.Invoke(dialog.Close);
+                    Dispatcher.Invoke(CheckProblems);
+                });
                 dialog.ShowDialog();
-                await t;
+                await globalTask;
+                App.LogStream.Log(new LogMessage("Finished updating files."));
             }
             catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
         }

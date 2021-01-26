@@ -66,6 +66,12 @@ namespace LBDCUpdater
             SaveBlacklist();
         }
 
+        public void DeleteImageCache()
+        {
+            if (Directory.Exists(Path.Combine(MinecraftFolder, "cachedImages")))
+                Directory.Delete(Path.Combine(MinecraftFolder, "cachedImages"), true);
+        }
+
         public async Task DownloadMissingAsync(Action<string, int, int>? listProgress, Action<string, long, long>? dataProgress, CancellationToken token)
         {
             if (!Directory.Exists(ModsFolder))
@@ -230,6 +236,22 @@ namespace LBDCUpdater
         {
             File.Delete(Path.Combine(ModsFolder, mod.ModName));
             mod.Installed = false;
+        }
+
+        public async Task UpdateOfflineSkinAsync(CancellationToken token)
+        {
+            if (!Directory.Exists(ConfigsFolder))
+                Directory.CreateDirectory(ConfigsFolder);
+            using var serverFile = await Task.Run(() => client.OpenRead("/home/mcftp/server2/config/offlineskins.cfg"));
+            using var localFile = new FileStream(Path.Combine(ConfigsFolder, "offlineskins.cfg"), FileMode.Create, FileAccess.Write);
+            await serverFile.CopyToAsync(localFile, token);
+            if (token.IsCancellationRequested)
+            {
+                localFile.Close();
+                File.Delete(Path.Combine(ConfigsFolder, "offlineskins.cfg"));
+                return;
+            }
+            localFile.Flush();
         }
 
         private async Task CheckModsAsync()
