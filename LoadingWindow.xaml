@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Width="350"
         SizeToContent="Height"
-        Title="Downloading" Closed="Window_Closed">
+        Title="Downloading" Closed="Window_Closed" WindowStartupLocation="CenterOwner">
     <StackPanel>
         <Label Name="globalProgressionText" HorizontalAlignment="Center" d:Content="24/144 (16%)" />
         <ProgressBar Height="12" Name="globalProgressionBar" />

@@ -9,7 +9,7 @@
         MinHeight="300"
         MinWidth="350"
         Width="350"
-        Title="Mods Optionnels" Initialized="Window_Initialized">
+        Title="Mods Optionnels" Initialized="Window_Initialized" WindowStartupLocation="CenterOwner">
     <DockPanel>
         <Button Height="40" Content="Mettre à jour" DockPanel.Dock="Bottom" Click="Button_Click" />
         <ScrollViewer>
