@@ -60,6 +60,11 @@ namespace LBDCUpdater
             await t;
         }
 
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            //TODO mods optionels
+        }
+
         private void CheckProblems()
         {
             var missing = Manager.MissingMods.Count();
