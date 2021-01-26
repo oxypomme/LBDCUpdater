@@ -1,4 +1,4 @@
-﻿<Window x:Class="LBDCUpdater.Window1"
+﻿<Window x:Class="LBDCUpdater.ClientSideInstallWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -9,11 +9,7 @@
         MinWidth="400"
         Title="Mods Optionnels">
     <StackPanel>
-        <ListBox MaxHeight="360" HorizontalContentAlignment="Stretch">
-            <local:ClientSideMod Title="MonMod" Description="Un super mod" Icon="res/forge.png" Image="res/forge.png" />
-            <local:ClientSideMod Title="MonMod" Description="Un super mod" Icon="res/forge.png" />
-            <local:ClientSideMod Title="MonMod" Description="Un super mod" IsChecked="True" />
-            <local:ClientSideMod Title="MonMod" />
+        <ListBox Name="optionalListBox" MaxHeight="360" HorizontalContentAlignment="Stretch">
         </ListBox>
         <Button Height="40">Continuer</Button>
     </StackPanel>

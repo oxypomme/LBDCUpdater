@@ -24,15 +24,8 @@ namespace LBDCUpdater
     {
         public MainWindow()
         {
-            try
-            {
-                Manager = new Manager();
-            }
-            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
             InitializeComponent();
         }
-
-        private Manager Manager { get; }
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -43,7 +36,7 @@ namespace LBDCUpdater
                 var ts = new CancellationTokenSource();
                 CancellationToken ct = ts.Token;
                 dialog.Canceled += ts.Cancel;
-                var t = Manager.DownloadMissingAsync(
+                var t = App.Manager.DownloadMissingAsync(
                     (mod, n, max) =>
                         Dispatcher.Invoke(() =>
                         {
@@ -86,8 +79,8 @@ namespace LBDCUpdater
             try
             {
                 App.LogStream.Log(new("Analizing missing files..."));
-                await Manager.InitAsync();
-                App.LogStream.Log(new($"Found {Manager.MissingMods.Count()} missing mods."));
+                await App.Manager.InitAsync();
+                App.LogStream.Log(new($"Found {App.Manager.MissingMods.Count()} missing mods."));
                 IsEnabled = true;
             }
             catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
