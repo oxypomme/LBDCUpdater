@@ -148,7 +148,7 @@ namespace LBDCUpdater
         {
             try
             {
-                App.LogStream.Log(new("Analizing missing files..."));
+                App.LogStream.Log(new("Analyzing missing files..."));
                 await App.Manager.InitAsync();
                 App.LogStream.Log(new($"Found {App.Manager.MissingMods.Count()} missing mods."));
                 IsEnabled = true;
