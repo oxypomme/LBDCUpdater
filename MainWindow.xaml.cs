@@ -145,6 +145,10 @@ namespace LBDCUpdater
             try
             {
                 App.LogStream.Log(new("Analizing missing files..."));
+                infoControl.Mode = InstallationInfo.DisplayMode.INFO;
+                infoControl.Text = "Analyse de l'installation...";
+                infoControl.Click = null;
+                infoControl.Clickable = false;
                 await App.Manager.InitAsync();
                 App.LogStream.Log(new($"Found {App.Manager.MissingMods.Count()} missing mods."));
                 IsEnabled = true;
