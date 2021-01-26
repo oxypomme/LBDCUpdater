@@ -7,14 +7,14 @@
         mc:Ignorable="d"
         Title="Blacklist" Height="450" Width="400">
     <DockPanel>
-        <Button DockPanel.Dock="Top">
+        <Button DockPanel.Dock="Top" Click="Button_Click">
             <StackPanel Orientation="Horizontal">
                 <Image Stretch="None" Source="/res/deleteMods.png" />
                 <Label Content="Supprimer les mods en trop" Foreground="Red" />
             </StackPanel>
         </Button>
         <ScrollViewer>
-            <StackPanel Orientation="Vertical" />
+            <StackPanel Orientation="Vertical" x:Name="modlist" />
         </ScrollViewer>
     </DockPanel>
 </Window>

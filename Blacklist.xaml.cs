@@ -24,8 +24,19 @@ namespace LBDCUpdater
             try
             {
                 InitializeComponent();
+                foreach (var item in App.Manager.LocalMods)
+                    modlist.Children.Add(new LocalModControl(item.Item1));
             }
             catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Critical, ex)); }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Êtes-vous sûr de vouloir supprimer tous les mods non ignorés ? Cette opération est irréversible.", "Suppression des mods", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            {
+                App.Manager.RemoveLocalMods();
+                Close();
+            }
         }
     }
 }

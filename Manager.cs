@@ -39,8 +39,8 @@ namespace LBDCUpdater
             client = new SftpClient(new ConnectionInfo(ip,
                                         user,
                                         new PasswordAuthenticationMethod(user, pass)));
-            LocalMods = new List<(string, bool)>();
-            MissingMods = Array.Empty<Mod>();
+            LocalMods = new LinkedList<(string, bool)>();
+            MissingMods = new LinkedList<Mod>();
             AllMods = Array.Empty<Mod>();
             OptionalMods = Array.Empty<OptionalMod>();
             ModListChanged = null;
@@ -49,8 +49,8 @@ namespace LBDCUpdater
             LoadBlacklist();
         }
 
-        public List<(string, bool)> LocalMods { get; private set; }
-        public IEnumerable<Mod> MissingMods { get; private set; }
+        public LinkedList<(string, bool)> LocalMods { get; private set; }
+        public LinkedList<Mod> MissingMods { get; private set; }
         public IEnumerable<OptionalMod> OptionalMods { get; private set; }
         private IEnumerable<Mod> AllMods { get; set; }
         private string MinecraftFolder { get; }
@@ -60,40 +60,40 @@ namespace LBDCUpdater
         {
             blacklist = blacklist.Concat(new[] { modname });
             LocalMods.Remove(LocalMods.First(c => c.Item1 == modname));
-            LocalMods.Add((modname, true));
+            LocalMods.AddLast((modname, true));
             SaveBlacklist();
         }
 
         public async Task DownloadMissingAsync(Action<string, int, int>? listProgress, Action<string, long, long>? dataProgress, CancellationToken token)
         {
-            int count = MissingMods.Count();
+            int count = MissingMods.Count;
             int modNb = 1;
-            foreach (var mod in MissingMods)
+            for (var it = MissingMods.First; it != null; it = it.Next)
             {
-                listProgress?.Invoke(mod.ModName, modNb, count);
-                using var localFile = new BufferedStream(new FileStream(Path.Combine(ModsFolder, mod.ModName), FileMode.Create, FileAccess.Write), 1024 << 5);
-                long size = await Task.Run(() => client.Get($"/home/mcftp/server2/mods/{mod.ModName}").Length);
-                using var serverFile = await Task.Run(() => client.OpenRead($"/home/mcftp/server2/mods/{mod.ModName}"));
+                listProgress?.Invoke(it.Value.ModName, modNb, count);
+                using var localFile = new BufferedStream(new FileStream(Path.Combine(ModsFolder, it.Value.ModName), FileMode.Create, FileAccess.Write), 1024 << 5);
+                long size = await Task.Run(() => client.Get($"/home/mcftp/server2/mods/{it.Value.ModName}").Length);
+                using var serverFile = await Task.Run(() => client.OpenRead($"/home/mcftp/server2/mods/{it.Value.ModName}"));
                 long writtenBytes = 0;
                 while (writtenBytes < size)
                 {
                     if (token.IsCancellationRequested)
                     {
                         localFile.Close();
-                        File.Delete(Path.Combine(ModsFolder, mod.ModName));
+                        File.Delete(Path.Combine(ModsFolder, it.Value.ModName));
                         await CheckModsAsync();
                         return;
                     }
                     byte[] bytes = new byte[1024 << 2];
-                    int written = await serverFile.ReadAsync(bytes.AsMemory(0, 1024 << 2));
+                    int written = await serverFile.ReadAsync(bytes.AsMemory(0, 1024 << 2), token);
                     localFile.Write(bytes, 0, written);
                     writtenBytes += written;
-                    dataProgress?.Invoke(mod.ModName, writtenBytes, size);
+                    dataProgress?.Invoke(it.Value.ModName, writtenBytes, size);
                 }
                 localFile.Flush();
                 modNb++;
+                MissingMods.Remove(it);
             }
-            await CheckModsAsync();
         }
 
         public async Task DownloadOptionalAsync(OptionalMod mod, Action<long, long>? dataProgress, Action? cancelEvent)
@@ -133,15 +133,18 @@ namespace LBDCUpdater
         {
             blacklist = blacklist.Except(new[] { modname });
             LocalMods.Remove(LocalMods.First(c => c.Item1 == modname));
-            LocalMods.Add((modname, false));
+            LocalMods.AddLast((modname, false));
             SaveBlacklist();
         }
 
         public void RemoveLocalMods()
         {
-            foreach (var item in LocalMods)
-                if (!item.Item2)
-                    File.Delete(Path.Combine(ModsFolder, item.Item1));
+            for (var it = LocalMods.First; it != null; it = it.Next)
+                if (!it.Value.Item2)
+                {
+                    File.Delete(Path.Combine(ModsFolder, it.Value.Item1));
+                    LocalMods.Remove(it);
+                }
         }
 
         public void RemoveOptional(OptionalMod mod)
@@ -167,7 +170,7 @@ namespace LBDCUpdater
                 else
                     list.AddLast(m);
             }
-            LocalMods = (from name in localMods where AllMods.All(m => m.ModName != name) select (name, blacklist.Any(m => m == name))).ToList();
+            LocalMods = new LinkedList<(string, bool)>((from name in localMods where AllMods.All(m => m.ModName != name) select (name, blacklist.Any(m => m == name))));
         }
 
         private void LoadBlacklist()
@@ -175,7 +178,7 @@ namespace LBDCUpdater
             try
             {
                 using var stream = new StreamReader("clientside.txt");
-                blacklist = stream.ReadToEnd().Split('\n');
+                blacklist = from mod in stream.ReadToEnd().Split('\n') where !string.IsNullOrWhiteSpace(mod) select mod.Trim();
             }
             catch (IOException)
             {
@@ -205,7 +208,7 @@ namespace LBDCUpdater
 
         private void SaveBlacklist()
         {
-            using var stream = new StreamWriter("clientside.txt");
+            using var stream = new StreamWriter("clientside.txt", false);
             foreach (var item in blacklist)
                 stream.WriteLine(item);
             stream.Flush();

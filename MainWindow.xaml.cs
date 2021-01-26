@@ -135,9 +135,9 @@ namespace LBDCUpdater
 
         private void DisplayBlacklist()
         {
-            var dialog = new Blacklist();
-            dialog.Owner = this;
+            var dialog = new Blacklist { Owner = this };
             dialog.ShowDialog();
+            CheckProblems();
         }
 
         private async void Window_Initialized(object sender, EventArgs e)
@@ -154,6 +154,7 @@ namespace LBDCUpdater
                 IsEnabled = true;
             }
             catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
+            CheckProblems();
         }
     }
 }
