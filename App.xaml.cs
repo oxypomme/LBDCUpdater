@@ -14,14 +14,12 @@ namespace LBDCUpdater
     public partial class App : Application
     {
         internal static LogStream LogStream = new LogStream("latest.log");
-        internal static Manager Manager { get; private set; }
 
         private App()
         {
             try
             {
                 Updater.CheckUpdates();
-                Manager = new Manager();
             }
             catch (Exception ex)
             {
@@ -29,5 +27,7 @@ namespace LBDCUpdater
                 throw;
             }
         }
+
+        internal static Manager Manager { get; private set; } = new Manager();
     }
 }
