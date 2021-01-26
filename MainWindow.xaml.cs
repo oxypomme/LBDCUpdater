@@ -77,25 +77,9 @@ namespace LBDCUpdater
             catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
         }
 
-        private void Forge_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        UseShellExecute = true,
-                        FileName = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/1.12.2-14.23.5.2854/forge-1.12.2-14.23.5.2854-installer.jar"
-                    }
-                }.Start();
-            }
-            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
-        }
-
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            //TODO mods optionels
+            new ClientSideInstallWindow { Owner = this }.ShowDialog();
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
@@ -142,6 +126,22 @@ namespace LBDCUpdater
             var dialog = new Blacklist { Owner = this };
             dialog.ShowDialog();
             CheckProblems();
+        }
+
+        private void Forge_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        UseShellExecute = true,
+                        FileName = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/1.12.2-14.23.5.2854/forge-1.12.2-14.23.5.2854-installer.jar"
+                    }
+                }.Start();
+            }
+            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
         }
 
         private async void Window_Initialized(object sender, EventArgs e)

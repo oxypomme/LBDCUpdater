@@ -198,8 +198,8 @@ namespace LBDCUpdater
                         new Mod(item.Name) :
                         new OptionalMod(mod.name, mod.description)
                         {
-                            Icon = mod.icon != null ? () => Task.Run(() => client.ReadAllBytes(mod.icon)) : null,
-                            Image = mod.image != null ? () => Task.Run(() => client.ReadAllBytes(mod.image)) : null
+                            Icon = mod.icon != null ? () => Task.Run(() => client.ReadAllBytes($"/home/mcftp/server2/optionalModsImages/{mod.icon}")) : null,
+                            Image = mod.image != null ? () => Task.Run(() => client.ReadAllBytes($"/home/mcftp/server2/optionalModsImages/{mod.image}")) : null
                         });
                 }
             OptionalMods = from mod in list where mod is OptionalMod select mod as OptionalMod;
