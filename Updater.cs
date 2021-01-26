@@ -31,7 +31,7 @@ namespace LBDCUpdater
                         App.LogStream.Log(new("Downloading update..."));
                         webClient.DownloadFile(new Uri("https://github.com/oxypomme/LBDCUpdater/releases/latest/download/LBDCUpdater-Setup.exe"), "LBDCUpdater-Setup.exe");
                         App.LogStream.Log(new("Installing update..."));
-                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("cmd.exe /k echo \"Mise à jour en cours...\" timeout 5 > NUL && LBDCUpdater-Setup.exe"));
+                        System.Diagnostics.Process.Start("LBDCUpdater-Setup.exe");
                         App.LogStream.Log(new("Restarting..."));
                         Environment.Exit(0);
                     }
