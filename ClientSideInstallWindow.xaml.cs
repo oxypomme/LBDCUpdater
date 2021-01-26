@@ -77,15 +77,16 @@ namespace LBDCUpdater
         private async void Window_Initialized(object sender, EventArgs e)
         {
             foreach (var optionalMod in App.Manager.OptionalMods)
-                optionalListBox.Children.Add(
-                    new ClientSideMod(() => optionalMod.GetImageAsync())
-                    {
-                        Title = optionalMod.ModName,
-                        Description = optionalMod.Description,
-                        Icon = await optionalMod.GetIconAsync(),
-                        IsChecked = optionalMod.Installed
-                    }
-                );
+            {
+                var modControl = new ClientSideMod(() => optionalMod.GetImageAsync())
+                {
+                    Title = optionalMod.ModName,
+                    Description = optionalMod.Description,
+                    IsChecked = optionalMod.Installed
+                };
+                await optionalMod.GetIconAsync().ContinueWith(t => Dispatcher.Invoke(() => modControl.Icon = t.Result));
+                optionalListBox.Children.Add(modControl);
+            }
         }
     }
 }

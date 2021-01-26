@@ -5,8 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LBDCUpdater"
         mc:Ignorable="d"
-        SizeToContent="Width"
-        MinWidth="400"
+        Height="500"
+        MinHeight="300"
+        MinWidth="350"
+        Width="350"
         Title="Mods Optionnels" Initialized="Window_Initialized">
     <DockPanel>
         <Button Height="40" Content="Mettre à jour" DockPanel.Dock="Bottom" Click="Button_Click" />

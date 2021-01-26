@@ -15,7 +15,10 @@
             </StackPanel>
         </StackPanel>
         <CheckBox.ToolTip>
-            <Image x:Name="modImage" MaxHeight="400" MaxWidth="600" />
+            <StackPanel Orientation="Horizontal">
+                <Image x:Name="modImage" MaxHeight="400" MaxWidth="600" />
+                <Label Name="noImage" Content="Aucune image" Visibility="Collapsed" />
+            </StackPanel>
         </CheckBox.ToolTip>
     </CheckBox>
 </UserControl>

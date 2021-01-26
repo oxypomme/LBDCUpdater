@@ -73,6 +73,7 @@ namespace LBDCUpdater
             try
             {
                 modImage.Source = await loadImage();
+                noImage.Visibility = modImage.Source is null ? Visibility.Visible : Visibility.Collapsed;
             }
             catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
         }
