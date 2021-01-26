@@ -7,10 +7,11 @@
         mc:Ignorable="d"
         SizeToContent="Width"
         MinWidth="400"
-        Title="Mods Optionnels">
-    <StackPanel>
-        <ListBox Name="optionalListBox" MaxHeight="360" HorizontalContentAlignment="Stretch">
-        </ListBox>
-        <Button Height="40">Continuer</Button>
-    </StackPanel>
+        Title="Mods Optionnels" Initialized="Window_Initialized">
+    <DockPanel>
+        <Button Height="40" Content="Mettre à jour" DockPanel.Dock="Bottom" />
+        <ScrollViewer>
+            <StackPanel Name="optionalListBox" />
+        </ScrollViewer>
+    </DockPanel>
 </Window>

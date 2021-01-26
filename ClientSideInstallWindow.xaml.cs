@@ -24,7 +24,6 @@ namespace LBDCUpdater
             try
             {
                 InitializeComponent();
-                InitializeModList();
             }
             catch (Exception ex)
             {
@@ -33,21 +32,17 @@ namespace LBDCUpdater
             }
         }
 
-        private async void InitializeModList()
+        private async void Window_Initialized(object sender, EventArgs e)
         {
-            try
-            {
-                foreach (var optionalMod in App.Manager.OptionalMods)
-                    optionalListBox.Items.Add(
-                        new ClientSideMod(() => optionalMod.GetImageAsync())
-                        {
-                            Title = optionalMod.ModName,
-                            Description = optionalMod.Description,
-                            Icon = await optionalMod.GetIconAsync()
-                        }
-                    );
-            }
-            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
+            foreach (var optionalMod in App.Manager.OptionalMods)
+                optionalListBox.Children.Add(
+                    new ClientSideMod(() => optionalMod.GetImageAsync())
+                    {
+                        Title = optionalMod.ModName,
+                        Description = optionalMod.Description,
+                        Icon = await optionalMod.GetIconAsync()
+                    }
+                );
         }
     }
 }

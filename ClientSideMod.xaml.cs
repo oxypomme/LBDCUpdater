@@ -68,7 +68,7 @@ namespace LBDCUpdater
 
         private Func<Task<ImageSource?>> loadImage { get; set; }
 
-        private async void ListBoxItem_ToolTipOpening(object sender, ToolTipEventArgs e)
+        private async void Checkbox_ToolTipOpening(object sender, ToolTipEventArgs e)
         {
             try
             {
