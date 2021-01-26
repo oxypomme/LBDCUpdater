@@ -24,7 +24,11 @@ namespace LBDCUpdater
     {
         public MainWindow()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
+            }
+            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Critical, ex)); }
         }
 
         private async void Button_Click(object sender, RoutedEventArgs e)
@@ -40,15 +44,23 @@ namespace LBDCUpdater
                     (mod, n, max) =>
                         Dispatcher.Invoke(() =>
                         {
-                            dialog.globalProgressionText.Content = $"{n}/{max} ({n * 100 / max}%)";
-                            dialog.globalProgressionBar.Value = n * 100 / max;
-                            App.LogStream.Log(new($"Downloading {mod}..."));
+                            try
+                            {
+                                dialog.globalProgressionText.Content = $"{n}/{max} ({n * 100 / max}%)";
+                                dialog.globalProgressionBar.Value = n * 100 / max;
+                                App.LogStream.Log(new($"Downloading {mod}..."));
+                            }
+                            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
                         }),
                     (mod, current, max) =>
                         Dispatcher.Invoke(() =>
                         {
-                            dialog.fileProgressionText.Content = $"{mod} ({current >> 10} / {max >> 10} Ko)";
-                            dialog.fileProgressionBar.Value = (current >> 10) * 100 / (max >> 10);
+                            try
+                            {
+                                dialog.fileProgressionText.Content = $"{mod} ({current >> 10} / {max >> 10} Ko)";
+                                dialog.fileProgressionBar.Value = (current >> 10) * 100 / (max >> 10);
+                            }
+                            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
                         }), ct).ContinueWith(t =>
                         {
                             Dispatcher.Invoke(dialog.Close);
@@ -84,7 +96,11 @@ namespace LBDCUpdater
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            DisplayBlacklist();
+            try
+            {
+                DisplayBlacklist();
+            }
+            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
         }
 
         private void CheckProblems()

@@ -21,7 +21,11 @@ namespace LBDCUpdater
     {
         public LoadingWindow()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
+            }
+            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Critical, ex)); }
             Canceled = null;
         }
 

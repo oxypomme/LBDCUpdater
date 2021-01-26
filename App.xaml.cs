@@ -23,7 +23,7 @@ namespace LBDCUpdater
                 Updater.CheckUpdates();
                 Manager = new Manager();
             }
-            catch (Exception ex) { LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
+            catch (Exception ex) { LogStream.Log(new(ex.ToString(), LogSeverity.Critical, ex)); }
         }
     }
 }

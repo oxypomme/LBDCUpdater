@@ -60,7 +60,11 @@ namespace LBDCUpdater
 
         public ClientSideMod(Func<Task<ImageSource?>> loadImageAction)
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
+            }
+            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Critical, ex)); }
             this.loadImage = loadImageAction;
         }
 

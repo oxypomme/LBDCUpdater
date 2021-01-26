@@ -21,8 +21,12 @@ namespace LBDCUpdater
     {
         public ClientSideInstallWindow()
         {
-            InitializeComponent();
-            InitializeModList();
+            try
+            {
+                InitializeComponent();
+                InitializeModList();
+            }
+            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Critical, ex)); }
         }
 
         private async void InitializeModList()

@@ -22,7 +22,11 @@ namespace LBDCUpdater
     {
         public LocalModControl(string mod)
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
+            }
+            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Critical, ex)); }
             modname.Content = mod;
         }
     }

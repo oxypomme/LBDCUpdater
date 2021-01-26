@@ -21,7 +21,11 @@ namespace LBDCUpdater
     {
         public Blacklist()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
+            }
+            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Critical, ex)); }
         }
     }
 }
