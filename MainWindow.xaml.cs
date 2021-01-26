@@ -50,10 +50,40 @@ namespace LBDCUpdater
                     {
                         dialog.fileProgressionText.Content = $"{mod} ({current >> 10} / {max >> 10} Ko)";
                         dialog.fileProgressionBar.Value = (current >> 10) * 100 / (max >> 10);
-                    }), ct).ContinueWith(t => Dispatcher.Invoke(dialog.Close));
+                    }), ct).ContinueWith(t =>
+                    {
+                        Dispatcher.Invoke(dialog.Close);
+                        Dispatcher.Invoke(CheckProblems);
+                    });
 
             dialog.ShowDialog();
             await t;
+        }
+
+        private void CheckProblems()
+        {
+            var missing = Manager.MissingMods.Count();
+            if (missing > 0)
+            {
+                infoControl.Mode = InstallationInfo.DisplayMode.ERROR;
+                infoControl.Text = missing == 1 ? $"{missing} mod est manquant. Il faut mettre à jour." : $"{missing} mods sont manquants. Il faut mettre à jour.";
+                infoControl.Click = null;
+                infoControl.Clickable = false;
+                return;
+            }
+            var conflicts = Manager.LocalMods.Sum(c => c.Item2 ? 0 : 1);
+            if (conflicts > 0)
+            {
+                infoControl.Mode = InstallationInfo.DisplayMode.WARNING;
+                infoControl.Text = missing == 1 ? $"{missing} mod est en trop. Cliquez pour choisir l'action à réaliser." : $"{missing} mods sont en trop. Cliquez pour choisir l'action à réaliser.";
+                infoControl.Click = null; //TODO lier à la blacklist
+                infoControl.Clickable = true;
+                return;
+            }
+            infoControl.Mode = InstallationInfo.DisplayMode.VALIDATE;
+            infoControl.Text = "Installation correcte";
+            infoControl.Click = null;
+            infoControl.Clickable = false;
         }
 
         private void Forge_Click(object sender, RoutedEventArgs e)
@@ -69,8 +99,13 @@ namespace LBDCUpdater
         private async void Window_Initialized(object sender, EventArgs e)
         {
             App.LogStream.Log(new("Analizing missing files...", LogSeverity.Info));
+            infoControl.Mode = InstallationInfo.DisplayMode.INFO;
+            infoControl.Text = "Analize de l'installation...";
+            infoControl.Click = null;
+            infoControl.Clickable = false;
             await Manager.InitAsync();
             App.LogStream.Log(new($"Found {Manager.MissingMods.Count()} missing mods.", LogSeverity.Info));
+            CheckProblems();
             IsEnabled = true;
         }
     }

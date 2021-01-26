@@ -11,6 +11,7 @@
   <ItemGroup>
     <None Remove="error.png" />
     <None Remove="res\forge.png" />
+    <None Remove="res\info.png" />
     <None Remove="res\synchro.png" />
     <None Remove="validate.png" />
     <None Remove="warning.png" />
@@ -23,11 +24,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="error.png" />
+    <Resource Include="res\error.png" />
     <Resource Include="res\forge.png" />
+    <Resource Include="res\info.png" />
     <Resource Include="res\synchro.png" />
-    <Resource Include="validate.png" />
-    <Resource Include="warning.png" />
+    <Resource Include="res\validate.png" />
+    <Resource Include="res\warning.png" />
   </ItemGroup>
 
 </Project>

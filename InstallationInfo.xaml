@@ -8,13 +8,16 @@
              MinHeight="30" d:DesignWidth="300" d:DesignHeight="150">
     <Grid MouseDown="Grid_MouseDown">
         <Grid x:Name="Warning" Background="#FFFF6902" Visibility="Collapsed">
-            <Image Height="25" Source="/warning.png" Margin="10,0" HorizontalAlignment="Left" />
+            <Image Height="25" Source="/res/warning.png" Margin="10,0" HorizontalAlignment="Left" />
         </Grid>
-        <Grid x:Name="Info" Visibility="Collapsed" Background="#FF00AC27">
-            <Image Height="25" Source="/validate.png" Margin="10,0" HorizontalAlignment="Left" />
+        <Grid x:Name="Info" Visibility="Collapsed" Background="#FF0068B0" d:Visibility="Visible">
+            <Image Height="25" Source="/res/info.png" Margin="10,0" HorizontalAlignment="Left" />
         </Grid>
-        <Grid Name="Error" Visibility="Collapsed" d:Visibility="Visible" Background="#FFAC0010">
-            <Image Height="25" Source="/error.png" Margin="10,0" HorizontalAlignment="Left" />
+        <Grid x:Name="Validate" Visibility="Collapsed" Background="#FF00AC27">
+            <Image Height="25" Source="/res/validate.png" Margin="10,0" HorizontalAlignment="Left" />
+        </Grid>
+        <Grid Name="Error" Visibility="Collapsed"  Background="#FFAC0010">
+            <Image Height="25" Source="/res/error.png" Margin="10,0" HorizontalAlignment="Left" />
         </Grid>
         <TextBlock x:Name="display" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40,5,5,5" TextWrapping="Wrap" />
     </Grid>
