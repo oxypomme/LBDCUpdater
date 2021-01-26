@@ -25,7 +25,11 @@ namespace LBDCUpdater
             {
                 InitializeComponent();
             }
-            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Critical, ex)); }
+            catch (Exception ex)
+            {
+                App.LogStream.Log(new(ex.ToString(), LogSeverity.Critical, ex));
+                throw;
+            }
             Click = null;
             Mode = DisplayMode.NONE;
             clickable = false;

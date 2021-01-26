@@ -27,7 +27,11 @@ namespace LBDCUpdater
                 foreach (var item in App.Manager.LocalMods)
                     modlist.Children.Add(new LocalModControl(item.Item1));
             }
-            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Critical, ex)); }
+            catch (Exception ex)
+            {
+                App.LogStream.Log(new(ex.ToString(), LogSeverity.Critical, ex));
+                throw;
+            }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

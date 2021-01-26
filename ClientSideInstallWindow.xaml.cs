@@ -26,7 +26,11 @@ namespace LBDCUpdater
                 InitializeComponent();
                 InitializeModList();
             }
-            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Critical, ex)); }
+            catch (Exception ex)
+            {
+                App.LogStream.Log(new(ex.ToString(), LogSeverity.Critical, ex));
+                throw;
+            }
         }
 
         private async void InitializeModList()

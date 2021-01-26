@@ -28,7 +28,11 @@ namespace LBDCUpdater
             {
                 InitializeComponent();
             }
-            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Critical, ex)); }
+            catch (Exception ex)
+            {
+                App.LogStream.Log(new(ex.ToString(), LogSeverity.Critical, ex));
+                throw;
+            }
         }
 
         private async void Button_Click(object sender, RoutedEventArgs e)
@@ -144,7 +148,7 @@ namespace LBDCUpdater
         {
             try
             {
-                App.LogStream.Log(new("Analizing missing files..."));
+                App.LogStream.Log(new("Analyzing missing files..."));
                 infoControl.Mode = InstallationInfo.DisplayMode.INFO;
                 infoControl.Text = "Analyse de l'installation...";
                 infoControl.Click = null;

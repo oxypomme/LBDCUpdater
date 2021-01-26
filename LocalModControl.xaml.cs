@@ -40,9 +40,13 @@ namespace LBDCUpdater
                     switchButton.IsChecked = false;
                 }
             }
-            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Critical, ex)); }
-        }
-
+            catch (Exception ex)
+            {
+                App.LogStream.Log(new(ex.ToString(), LogSeverity.Critical, ex));
+                throw;
+            }
+        }    
+        
         private void switchButton_Click(object sender, RoutedEventArgs e)
         {
             if (isChecked != switchButton.IsChecked)
