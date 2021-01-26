@@ -106,7 +106,17 @@ namespace LBDCUpdater
                 var ts = new CancellationTokenSource();
                 CancellationToken ct = ts.Token;
                 dialog.Canceled += ts.Cancel;
+                dialog.globalProgressionBar.Value = 0;
                 var t = App.Manager.ImportConfigAsync(
+                    (n, max) =>
+                        Dispatcher.Invoke(() =>
+                        {
+                            try
+                            {
+                                dialog.globalProgressionText.Content = $"{n}/{max} ({n * 100 / Math.Max(max, 1)}%)";
+                            }
+                            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
+                        }),
                     (config, n, max) =>
                         Dispatcher.Invoke(() =>
                         {

@@ -52,26 +52,32 @@ namespace LBDCUpdater
             var ts = new CancellationTokenSource();
             CancellationToken ct = ts.Token;
             dialog.Canceled += ts.Cancel;
-            int n = 1;
-            foreach (var mod in toInstall)
-            {
-                App.LogStream.Log(new($"Downloading {mod.ModName}..."));
-                var t = App.Manager.DownloadOptionalAsync(mod, (curr, max) =>
+            var t = App.Manager.DownloadOptionalAsync(toInstall, (modname, curr, max) =>
                 Dispatcher.Invoke(() =>
                 {
                     try
                     {
-                        dialog.globalProgressionText.Content = $"{n}/{toInstall.Count} ({n * 100 / toInstall.Count}%)";
-                        dialog.globalProgressionBar.Value = n * 100 / toInstall.Count;
-                        dialog.fileProgressionText.Content = $"{mod.ModName} ({curr >> 10} / {max >> 10} Ko)";
+                        dialog.globalProgressionText.Content = $"{curr}/{max} ({curr * 100 / max}%)";
+                        dialog.globalProgressionBar.Value = curr * 100 / max;
+                        App.LogStream.Log(new($"Downloading {modname}..."));
+                    }
+                    catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
+                }), (modname, curr, max) =>
+                Dispatcher.Invoke(() =>
+                {
+                    try
+                    {
+                        dialog.fileProgressionText.Content = $"{modname} ({curr >> 10} / {max >> 10} Ko)";
                         dialog.fileProgressionBar.Value = (curr >> 10) * 100 / (max >> 10);
                     }
                     catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
-                }), ct);
-                n++;
-                await t;
-            }
-            MessageBox.Show("Mods mis à jour", "Téléchargement", MessageBoxButton.OK, MessageBoxImage.Information);
+                }), ct).ContinueWith(t =>
+                {
+                    Dispatcher.Invoke(dialog.Close);
+                    Dispatcher.Invoke(() => MessageBox.Show("Mods mis à jour", "Téléchargement", MessageBoxButton.OK, MessageBoxImage.Information));
+                });
+            dialog.ShowDialog();
+            await t;
         }
 
         private async void Window_Initialized(object sender, EventArgs e)

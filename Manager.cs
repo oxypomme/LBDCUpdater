@@ -78,7 +78,7 @@ namespace LBDCUpdater
                 Directory.CreateDirectory(ModsFolder);
             int count = MissingMods.Count;
             int modNb = 1;
-            for (var it = MissingMods.First; it != null; it = it.Next)
+            for (var it = MissingMods.First; it != null;)
             {
                 listProgress?.Invoke(it.Value.ModName, modNb, count);
                 using var localFile = new BufferedStream(new FileStream(Path.Combine(ModsFolder, it.Value.ModName), FileMode.Create, FileAccess.Write), 1024 << 5);
@@ -102,37 +102,46 @@ namespace LBDCUpdater
                 }
                 localFile.Flush();
                 modNb++;
+                var cpyIt = it.Next;
                 MissingMods.Remove(it);
+                it = cpyIt;
             }
         }
 
-        public async Task DownloadOptionalAsync(OptionalMod mod, Action<long, long>? dataProgress, CancellationToken token)
+        public async Task DownloadOptionalAsync(IEnumerable<OptionalMod> mods, Action<string, int, int>? listProgress, Action<string, long, long>? dataProgress, CancellationToken token)
         {
             if (!Directory.Exists(ModsFolder))
                 Directory.CreateDirectory(ModsFolder);
-            using var localFile = new BufferedStream(new FileStream(Path.Combine(ModsFolder, mod.ModName), FileMode.Create, FileAccess.Write), 1024 << 5);
-            long size = await Task.Run(() => client.Get($"/home/mcftp/server2/" + (mod.ClientOnly ? "clientMods" : "mods") + $"/{mod.ModName}").Length);
-            using var serverFile = await Task.Run(() => client.OpenRead($"/home/mcftp/server2/" + (mod.ClientOnly ? "clientMods" : "mods") + $"/{mod.ModName}"));
-            long writtenBytes = 0;
-            while (writtenBytes < size)
+            int nbMod = 1;
+            int count = mods.Count();
+            foreach (var mod in mods)
             {
-                byte[] bytes = new byte[1024 << 2];
-                int written = await serverFile.ReadAsync(bytes.AsMemory(0, 1024 << 2), token);
-                if (token.IsCancellationRequested)
+                listProgress?.Invoke(mod.ModName, nbMod, count);
+                using var localFile = new BufferedStream(new FileStream(Path.Combine(ModsFolder, mod.ModName), FileMode.Create, FileAccess.Write), 1024 << 5);
+                long size = await Task.Run(() => client.Get($"/home/mcftp/server2/" + (mod.ClientOnly ? "clientMods" : "mods") + $"/{mod.ModName}").Length);
+                using var serverFile = await Task.Run(() => client.OpenRead($"/home/mcftp/server2/" + (mod.ClientOnly ? "clientMods" : "mods") + $"/{mod.ModName}"));
+                long writtenBytes = 0;
+                while (writtenBytes < size)
                 {
-                    localFile.Close();
-                    File.Delete(Path.Combine(ModsFolder, mod.ModName));
-                    return;
+                    byte[] bytes = new byte[1024 << 2];
+                    int written = await serverFile.ReadAsync(bytes.AsMemory(0, 1024 << 2), token);
+                    if (token.IsCancellationRequested)
+                    {
+                        localFile.Close();
+                        File.Delete(Path.Combine(ModsFolder, mod.ModName));
+                        return;
+                    }
+                    localFile.Write(bytes, 0, written);
+                    writtenBytes += written;
+                    dataProgress?.Invoke(mod.ModName, writtenBytes, size);
                 }
-                localFile.Write(bytes, 0, written);
-                writtenBytes += written;
-                dataProgress?.Invoke(writtenBytes, size);
+                localFile.Flush();
+                mod.Installed = true;
+                nbMod++;
             }
-            localFile.Flush();
-            mod.Installed = true;
         }
 
-        public async Task ImportConfigAsync(Action<string, int, int>? listProgress, Action<string, long, long>? dataProgress, CancellationToken token)
+        public async Task ImportConfigAsync(Action<int, int>? countProgress, Action<string, int, int>? listProgress, Action<string, long, long>? dataProgress, CancellationToken token)
         {
             var relativeTo = $"/home/mcftp/server2/config";
             var count = 0;
@@ -146,7 +155,7 @@ namespace LBDCUpdater
                         c += await recursiveCount(item.FullName);
                     else
                     {
-                        listProgress?.Invoke("", 0, count);
+                        countProgress?.Invoke(0, count);
                         c++;
                     }
                 }
@@ -289,6 +298,8 @@ namespace LBDCUpdater
 
         private async Task RefreshAsync()
         {
+            if (!Directory.Exists(ModsFolder))
+                Directory.CreateDirectory(ModsFolder);
             var optMods = Newtonsoft.Json.JsonConvert.DeserializeObject<FtpMod[]>(await Task.Run(() => client.ReadAllText("/home/mcftp/server2/optionalMods.json")));
             var list = new LinkedList<Mod>();
             foreach (var item in await Task.Run(() => client.ListDirectory("/home/mcftp/server2/mods")))
