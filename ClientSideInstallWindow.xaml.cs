@@ -55,6 +55,7 @@ namespace LBDCUpdater
             int n = 1;
             foreach (var mod in toInstall)
             {
+                App.LogStream.Log(new($"Downloading {mod.ModName}..."));
                 var t = App.Manager.DownloadOptionalAsync(mod, (curr, max) =>
                 Dispatcher.Invoke(() =>
                 {
@@ -64,7 +65,6 @@ namespace LBDCUpdater
                         dialog.globalProgressionBar.Value = n * 100 / toInstall.Count;
                         dialog.fileProgressionText.Content = $"{mod.ModName} ({curr >> 10} / {max >> 10} Ko)";
                         dialog.fileProgressionBar.Value = (curr >> 10) * 100 / (max >> 10);
-                        App.LogStream.Log(new($"Downloading {mod.ModName}..."));
                     }
                     catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
                 }), ct);

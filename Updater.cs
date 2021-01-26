@@ -29,7 +29,7 @@ namespace LBDCUpdater
                     {
                         WebClient webClient = new WebClient();
                         App.LogStream.Log(new("Downloading update..."));
-                        webClient.DownloadFile(new Uri("https://github.com/oxypomme/LBDCUpdater/releases/latest/download/LBDCUpdater.exe"), "LBDCUpdater_new.exe");
+                        webClient.DownloadFile(new Uri("https://github.com/oxypomme/LBDCUpdater/releases/latest/download/LBDCUpdater-Setup.exe"), "LBDCUpdater-Setup.exe");
                         App.LogStream.Log(new("Installing update..."));
                         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("cmd.exe /k echo \"Mise à jour en cours...\" timeout 5 > NUL && move LBDCUpdater_new.exe LBDCUpdater.exe && LBDCUpdater.exe"));
                         App.LogStream.Log(new("Restarting..."));
