@@ -49,8 +49,11 @@ namespace LBDCUpdater
                         {
                             dialog.fileProgressionText.Content = $"{mod} ({current >> 10} / {max >> 10} Ko)";
                             dialog.fileProgressionBar.Value = (current >> 10) * 100 / (max >> 10);
-                        }), ct
-                ).ContinueWith(t => Dispatcher.Invoke(dialog.Close));
+                        }), ct).ContinueWith(t =>
+                        {
+                            Dispatcher.Invoke(dialog.Close);
+                            Dispatcher.Invoke(CheckProblems);
+                        });
 
                 dialog.ShowDialog();
                 await t;
@@ -70,6 +73,41 @@ namespace LBDCUpdater
                         FileName = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/1.12.2-14.23.5.2854/forge-1.12.2-14.23.5.2854-installer.jar"
                     }
                 }.Start();
+            }
+            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            //TODO mods optionels
+        }
+
+        private void CheckProblems()
+        {
+            try
+            {
+                var missing = App.Manager.MissingMods.Count();
+                if (missing > 0)
+                {
+                    infoControl.Mode = InstallationInfo.DisplayMode.ERROR;
+                    infoControl.Text = missing == 1 ? $"{missing} mod est manquant. Il faut mettre à jour." : $"{missing} mods sont manquants. Il faut mettre à jour.";
+                    infoControl.Click = null;
+                    infoControl.Clickable = false;
+                    return;
+                }
+                var conflicts = App.Manager.LocalMods.Sum(c => c.Item2 ? 0 : 1);
+                if (conflicts > 0)
+                {
+                    infoControl.Mode = InstallationInfo.DisplayMode.WARNING;
+                    infoControl.Text = conflicts == 1 ? $"{conflicts} mod est en trop. Cliquez pour choisir l'action à réaliser." : $"{missing} mods sont en trop. Cliquez pour choisir l'action à réaliser.";
+                    infoControl.Click = null; //TODO lier à la blacklist
+                    infoControl.Clickable = true;
+                    return;
+                }
+                infoControl.Mode = InstallationInfo.DisplayMode.VALIDATE;
+                infoControl.Text = "Installation correcte";
+                infoControl.Click = null;
+                infoControl.Clickable = false;
             }
             catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
         }

@@ -31,6 +31,7 @@ namespace LBDCUpdater
         {
             NONE,
             INFO,
+            VALIDATE,
             WARNING,
             ERROR
         }
@@ -49,12 +50,17 @@ namespace LBDCUpdater
             {
                 Visibility = Visibility.Visible;
                 Info.Visibility = Visibility.Collapsed;
+                Validate.Visibility = Visibility.Collapsed;
                 Warning.Visibility = Visibility.Collapsed;
                 Error.Visibility = Visibility.Collapsed;
                 switch (value)
                 {
                     case DisplayMode.INFO:
                         Info.Visibility = Visibility.Visible;
+                        break;
+
+                    case DisplayMode.VALIDATE:
+                        Validate.Visibility = Visibility.Visible;
                         break;
 
                     case DisplayMode.WARNING:
