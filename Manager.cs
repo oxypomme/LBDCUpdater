@@ -303,7 +303,7 @@ namespace LBDCUpdater
             var optMods = Newtonsoft.Json.JsonConvert.DeserializeObject<FtpMod[]>(await Task.Run(() => client.ReadAllText("/home/mcftp/server2/optionalMods.json")));
             var list = new LinkedList<Mod>();
             foreach (var item in await Task.Run(() => client.ListDirectory("/home/mcftp/server2/mods")))
-                if (item.Name is not ("." or ".."))
+                if (!item.IsDirectory)
                     if (!optMods.Any(m => m.name == item.Name))
                         list.AddLast(new Mod(item.Name));
             foreach (var item in optMods)
