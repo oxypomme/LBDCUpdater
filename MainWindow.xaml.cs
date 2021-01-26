@@ -91,6 +91,54 @@ namespace LBDCUpdater
             catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
         }
 
+        private async void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var dialog = new LoadingWindow();
+                dialog.Owner = this;
+                var ts = new CancellationTokenSource();
+                CancellationToken ct = ts.Token;
+                dialog.Canceled += ts.Cancel;
+                var t = App.Manager.ImportConfigAsync(
+                    (config, n, max) =>
+                        Dispatcher.Invoke(() =>
+                        {
+                            try
+                            {
+                                dialog.globalProgressionText.Content = $"{n}/{max} ({n * 100 / max}%)";
+                                dialog.globalProgressionBar.Value = n * 100 / max;
+                                App.LogStream.Log(new($"Downloading {config}..."));
+                            }
+                            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
+                        }),
+                    (config, current, max) =>
+                        Dispatcher.Invoke(() =>
+                        {
+                            try
+                            {
+                                current >>= 10;
+                                max >>= 10;
+                                if (current < 1)
+                                    current = 1;
+                                if (max < 1)
+                                    max = 1;
+                                dialog.fileProgressionText.Content = $"{config} ({current} / {max} Ko)";
+                                dialog.fileProgressionBar.Value = current * 100 / max;
+                            }
+                            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
+                        }), ct).ContinueWith(t =>
+                        {
+                            Dispatcher.Invoke(dialog.Close);
+                            Dispatcher.Invoke(CheckProblems);
+                        });
+
+                dialog.ShowDialog();
+                await t;
+            }
+            catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
+        }
+
         private void CheckProblems()
         {
             try

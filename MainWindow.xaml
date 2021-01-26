@@ -14,6 +14,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -21,14 +22,14 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <local:InstallationInfo Grid.ColumnSpan="2" x:Name="infoControl" />
-        <Button Grid.ColumnSpan="2" Grid.Row="1" Click="Button_Click">
+        <local:InstallationInfo Grid.ColumnSpan="3" x:Name="infoControl" />
+        <Button Grid.ColumnSpan="3" Grid.Row="1" Click="Button_Click">
             <StackPanel Orientation="Horizontal">
                 <Image Source="/res/synchro.png" Width="16" />
                 <TextBlock Padding="5">Mettre à jour</TextBlock>
             </StackPanel>
         </Button>
-        <Button Grid.ColumnSpan="2" Grid.Row="2" Click="Button_Click_1">
+        <Button Grid.ColumnSpan="3" Grid.Row="2" Click="Button_Click_1">
             <StackPanel Orientation="Horizontal">
                 <Image Source="/res/client.png" Width="16" />
                 <TextBlock Padding="5">Mods optionels</TextBlock>
@@ -44,6 +45,12 @@
             <StackPanel Orientation="Horizontal">
                 <Image Width="16" />
                 <TextBlock Padding="5">Liste noire</TextBlock>
+            </StackPanel>
+        </Button>
+        <Button Grid.Column="2" Grid.Row="3" Click="Button_Click_3">
+            <StackPanel Orientation="Horizontal">
+                <Image Width="16" Source="/res/configs.png" />
+                <TextBlock Padding="5">Importer configs</TextBlock>
             </StackPanel>
         </Button>
     </Grid>

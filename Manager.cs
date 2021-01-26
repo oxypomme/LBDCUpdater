@@ -27,6 +27,7 @@ namespace LBDCUpdater
         {
             MinecraftFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ".minecraft");
             ModsFolder = Path.Combine(MinecraftFolder, "mods");
+            ConfigsFolder = Path.Combine(MinecraftFolder, "config");
             using var stream = new StreamReader("connection.txt");
             var ip = stream.ReadLine();
             var user = stream.ReadLine();
@@ -53,6 +54,7 @@ namespace LBDCUpdater
         public LinkedList<Mod> MissingMods { get; private set; }
         public IEnumerable<OptionalMod> OptionalMods { get; private set; }
         private IEnumerable<Mod> AllMods { get; set; }
+        private string ConfigsFolder { get; }
         private string MinecraftFolder { get; }
         private string ModsFolder { get; }
 
@@ -66,6 +68,8 @@ namespace LBDCUpdater
 
         public async Task DownloadMissingAsync(Action<string, int, int>? listProgress, Action<string, long, long>? dataProgress, CancellationToken token)
         {
+            if (!Directory.Exists(ModsFolder))
+                Directory.CreateDirectory(ModsFolder);
             int count = MissingMods.Count;
             int modNb = 1;
             for (var it = MissingMods.First; it != null; it = it.Next)
@@ -98,6 +102,8 @@ namespace LBDCUpdater
 
         public async Task DownloadOptionalAsync(OptionalMod mod, Action<long, long>? dataProgress, CancellationToken token)
         {
+            if (!Directory.Exists(ModsFolder))
+                Directory.CreateDirectory(ModsFolder);
             using var localFile = new BufferedStream(new FileStream(Path.Combine(ModsFolder, mod.ModName), FileMode.Create, FileAccess.Write), 1024 << 5);
             long size = await Task.Run(() => client.Get($"/home/mcftp/server2/mods/{mod.ModName}").Length);
             using var serverFile = await Task.Run(() => client.OpenRead($"/home/mcftp/server2/mods/{mod.ModName}"));
@@ -118,6 +124,81 @@ namespace LBDCUpdater
             }
             localFile.Flush();
             mod.Installed = true;
+        }
+
+        public async Task ImportConfigAsync(Action<string, int, int>? listProgress, Action<string, long, long>? dataProgress, CancellationToken token)
+        {
+            var relativeTo = $"/home/mcftp/server2/config";
+            var count = 0;
+            async Task<int> recursiveCount(string folder)
+            {
+                var files = await Task.Run(() => from f in client.ListDirectory(folder) where f is not { Name: "." or ".." } select f, token);
+                int c = 0;
+                foreach (var item in files)
+                {
+                    if (item.IsDirectory)
+                        c += await recursiveCount(item.FullName);
+                    else
+                    {
+                        listProgress?.Invoke("", 0, count);
+                        c++;
+                    }
+                }
+                count += c;
+                return c;
+            }
+            var nbMod = 1;
+            count = await recursiveCount(relativeTo);
+            async Task ImportFolder(string folder)
+            {
+                var files = await Task.Run(() => from f in client.ListDirectory(folder) where f is not { Name: "." or ".." } select f, token);
+                foreach (var file in from entry in files where entry.IsDirectory select entry.FullName)
+                {
+                    var localFolder = file[(relativeTo.Length + 1)..];
+                    {
+                        var folderpath = string.IsNullOrEmpty(localFolder) ? ConfigsFolder : Path.Combine(ConfigsFolder, localFolder);
+                        if (!Directory.Exists(folderpath))
+                            Directory.CreateDirectory(folderpath);
+                    }
+                    await ImportFolder(file);
+                    if (token.IsCancellationRequested)
+                        return;
+                }
+                foreach (var file in from entry in files where !entry.IsDirectory select entry.FullName)
+                {
+                    var localRelativeDirectory = Path.GetDirectoryName(file[(relativeTo.Length + 1)..]);
+                    var fileName = Path.GetFileName(file);
+                    var localFilePath = string.IsNullOrEmpty(localRelativeDirectory) ? Path.Combine(ConfigsFolder, fileName) : Path.Combine(ConfigsFolder, localRelativeDirectory, fileName);
+                    using var localFile = new FileStream(localFilePath, FileMode.Create, FileAccess.Write);
+                    using var distantFile = await Task.Run(() => client.OpenRead(file), token);
+                    if (token.IsCancellationRequested)
+                    {
+                        localFile.Close();
+                        File.Delete(localFilePath);
+                        return;
+                    }
+                    listProgress?.Invoke(fileName, nbMod, count);
+                    long size = await Task.Run(() => client.Get(file).Length);
+                    long writtenBytes = 0;
+                    while (writtenBytes < size)
+                    {
+                        byte[] bytes = new byte[1024 << 2];
+                        int written = await distantFile.ReadAsync(bytes.AsMemory(0, 1024 << 2), token);
+                        if (token.IsCancellationRequested)
+                        {
+                            localFile.Close();
+                            File.Delete(localFilePath);
+                            return;
+                        }
+                        localFile.Write(bytes, 0, written);
+                        writtenBytes += written;
+                        dataProgress?.Invoke(fileName, writtenBytes, size);
+                    }
+                    localFile.Flush();
+                    nbMod++;
+                }
+            }
+            await ImportFolder(relativeTo);
         }
 
         public async Task InitAsync()
