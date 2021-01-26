@@ -111,8 +111,8 @@ namespace LBDCUpdater
             if (!Directory.Exists(ModsFolder))
                 Directory.CreateDirectory(ModsFolder);
             using var localFile = new BufferedStream(new FileStream(Path.Combine(ModsFolder, mod.ModName), FileMode.Create, FileAccess.Write), 1024 << 5);
-            long size = await Task.Run(() => client.Get($"/home/mcftp/server2/mods/{mod.ModName}").Length);
-            using var serverFile = await Task.Run(() => client.OpenRead($"/home/mcftp/server2/mods/{mod.ModName}"));
+            long size = await Task.Run(() => client.Get($"/home/mcftp/server2/" + (mod.ClientOnly ? "clientMods" : "mods") + $"/{mod.ModName}").Length);
+            using var serverFile = await Task.Run(() => client.OpenRead($"/home/mcftp/server2/" + (mod.ClientOnly ? "clientMods" : "mods") + $"/{mod.ModName}"));
             long writtenBytes = 0;
             while (writtenBytes < size)
             {
@@ -293,16 +293,18 @@ namespace LBDCUpdater
             var list = new LinkedList<Mod>();
             foreach (var item in await Task.Run(() => client.ListDirectory("/home/mcftp/server2/mods")))
                 if (item.Name is not ("." or ".."))
-                {
-                    var mod = optMods.FirstOrDefault(m => m.name == item.Name);
-                    list.AddLast(mod == null ?
-                        new Mod(item.Name) :
-                        new OptionalMod(mod.name, mod.description)
-                        {
-                            Icon = mod.icon != null ? () => Task.Run(() => client.ReadAllBytes($"/home/mcftp/server2/optionalModsImages/{mod.icon}")) : null,
-                            Image = mod.image != null ? () => Task.Run(() => client.ReadAllBytes($"/home/mcftp/server2/optionalModsImages/{mod.image}")) : null
-                        });
-                }
+                    if (!optMods.Any(m => m.name == item.Name))
+                        list.AddLast(new Mod(item.Name));
+            foreach (var item in optMods)
+            {
+                list.AddLast(
+                    new OptionalMod(item.name, item.description)
+                    {
+                        ClientOnly = item.clientOnly,
+                        Icon = item.icon != null ? () => Task.Run(() => client.ReadAllBytes($"/home/mcftp/server2/optionalModsImages/{item.icon}")) : null,
+                        Image = item.image != null ? () => Task.Run(() => client.ReadAllBytes($"/home/mcftp/server2/optionalModsImages/{item.image}")) : null
+                    });
+            }
             OptionalMods = from mod in list where mod is OptionalMod select mod as OptionalMod;
             AllMods = list;
         }
@@ -322,6 +324,7 @@ namespace LBDCUpdater
 
         private class FtpMod
         {
+            public bool clientOnly = false;
             public string? description = null;
             public string? icon = null;
             public string? image = null;
@@ -345,6 +348,7 @@ namespace LBDCUpdater
 
         public OptionalMod(string modname, string? description = null, Func<Task<byte[]>>? icon = null, Func<Task<byte[]>>? image = null) : base(modname) => (Description, Icon, Image) = (description, icon, image);
 
+        public bool ClientOnly { get; init; }
         public string? Description { get; init; }
         public Func<Task<byte[]>>? Icon { private get; init; }
         public Func<Task<byte[]>>? Image { private get; init; }
