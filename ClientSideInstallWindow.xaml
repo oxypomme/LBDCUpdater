@@ -9,7 +9,7 @@
         MinWidth="400"
         Title="Mods Optionnels" Initialized="Window_Initialized">
     <DockPanel>
-        <Button Height="40" Content="Mettre à jour" DockPanel.Dock="Bottom" />
+        <Button Height="40" Content="Mettre à jour" DockPanel.Dock="Bottom" Click="Button_Click" />
         <ScrollViewer>
             <StackPanel Name="optionalListBox" />
         </ScrollViewer>

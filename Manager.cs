@@ -77,6 +77,8 @@ namespace LBDCUpdater
                 long writtenBytes = 0;
                 while (writtenBytes < size)
                 {
+                    byte[] bytes = new byte[1024 << 2];
+                    int written = await serverFile.ReadAsync(bytes.AsMemory(0, 1024 << 2), token);
                     if (token.IsCancellationRequested)
                     {
                         localFile.Close();
@@ -84,8 +86,6 @@ namespace LBDCUpdater
                         await CheckModsAsync();
                         return;
                     }
-                    byte[] bytes = new byte[1024 << 2];
-                    int written = await serverFile.ReadAsync(bytes.AsMemory(0, 1024 << 2), token);
                     localFile.Write(bytes, 0, written);
                     writtenBytes += written;
                     dataProgress?.Invoke(it.Value.ModName, writtenBytes, size);
@@ -96,24 +96,22 @@ namespace LBDCUpdater
             }
         }
 
-        public async Task DownloadOptionalAsync(OptionalMod mod, Action<long, long>? dataProgress, Action? cancelEvent)
+        public async Task DownloadOptionalAsync(OptionalMod mod, Action<long, long>? dataProgress, CancellationToken token)
         {
             using var localFile = new BufferedStream(new FileStream(Path.Combine(ModsFolder, mod.ModName), FileMode.Create, FileAccess.Write), 1024 << 5);
             long size = await Task.Run(() => client.Get($"/home/mcftp/server2/mods/{mod.ModName}").Length);
             using var serverFile = await Task.Run(() => client.OpenRead($"/home/mcftp/server2/mods/{mod.ModName}"));
             long writtenBytes = 0;
-            bool abort = false;
-            cancelEvent += () => abort = true;
             while (writtenBytes < size)
             {
-                if (abort)
+                byte[] bytes = new byte[1024 << 2];
+                int written = await serverFile.ReadAsync(bytes.AsMemory(0, 1024 << 2), token);
+                if (token.IsCancellationRequested)
                 {
                     localFile.Close();
                     File.Delete(Path.Combine(ModsFolder, mod.ModName));
                     return;
                 }
-                byte[] bytes = new byte[1024 << 2];
-                int written = await serverFile.ReadAsync(bytes.AsMemory(0, 1024 << 2));
                 localFile.Write(bytes, 0, written);
                 writtenBytes += written;
                 dataProgress?.Invoke(writtenBytes, size);
@@ -162,7 +160,7 @@ namespace LBDCUpdater
             {
                 if (m is OptionalMod om)
                     om.Installed = localMods.Any(name => name == m.ModName);
-                if (localMods.Contains(m.ModName))
+                else if (localMods.Contains(m.ModName))
                 {
                     if (new FileInfo(Path.Combine(ModsFolder, m.ModName)).Length != await Task.Run(() => client.Get($"/home/mcftp/server2/mods/{m.ModName}").Length))
                         list.AddLast(m);
