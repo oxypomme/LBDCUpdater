@@ -79,7 +79,7 @@ namespace LBDCUpdater
                 dialog.ShowDialog();
                 await globalTask;
                 App.LogStream.Log(new LogMessage("Finished updating files."));
-                var configDlMessageResult = MessageBox.Show("Mods mis à jour. Voulez vous lancer le téléchargement des configs ?", "Téléchargement", MessageBoxButton.YesNoCancel);
+                var configDlMessageResult = MessageBox.Show("Mods mis à jour. Voulez vous lancer le téléchargement des configs ?", "Téléchargement", MessageBoxButton.YesNo);
                 if (configDlMessageResult == MessageBoxResult.Yes)
                     DownloadConfig();
             }
