@@ -233,12 +233,16 @@ namespace LBDCUpdater
 
         public void RemoveLocalMods()
         {
-            for (var it = LocalMods.First; it != null; it = it.Next)
+            for (var it = LocalMods.First; it != null;)
+            {
+                var tmpIt = it.Next;
                 if (!it.Value.Item2)
                 {
                     File.Delete(Path.Combine(ModsFolder, it.Value.Item1));
                     LocalMods.Remove(it);
                 }
+                it = tmpIt;
+            }
         }
 
         public void RemoveOptional(OptionalMod mod)

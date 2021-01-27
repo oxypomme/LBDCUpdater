@@ -177,7 +177,7 @@ namespace LBDCUpdater
                 if (conflicts > 0)
                 {
                     infoControl.Mode = InstallationInfo.DisplayMode.WARNING;
-                    infoControl.Text = conflicts == 1 ? $"{conflicts} mod est en trop. Cliquez pour choisir l'action à réaliser." : $"{missing} mods sont en trop. Cliquez pour choisir l'action à réaliser.";
+                    infoControl.Text = conflicts == 1 ? $"{conflicts} mod est en trop. Cliquez pour choisir l'action à réaliser." : $"{conflicts} mods sont en trop. Cliquez pour choisir l'action à réaliser.";
                     infoControl.Click = DisplayBlacklist;
                     infoControl.Clickable = true;
                     return;
