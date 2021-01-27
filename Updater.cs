@@ -27,13 +27,17 @@ namespace LBDCUpdater
                     var result = MessageBox.Show("Une nouvelle version du logiciel est disponible. Voulez-vous la télécharger ?", "Updater", MessageBoxButton.YesNo, MessageBoxImage.Information);
                     if (result == MessageBoxResult.Yes)
                     {
+                        MessageBox.Show("La nouvelle version est entrain d'être téléchargée... Vous pouvez toujours utiliser le logiciel pendant ce temps.", "Updater");
                         WebClient webClient = new WebClient();
                         App.LogStream.Log(new("Downloading update..."));
                         webClient.DownloadFile(new Uri("https://github.com/oxypomme/LBDCUpdater/releases/latest/download/LBDCUpdater-Setup.exe"), "LBDCUpdater-Setup.exe");
-                        App.LogStream.Log(new("Installing update..."));
-                        System.Diagnostics.Process.Start("LBDCUpdater-Setup.exe");
-                        App.LogStream.Log(new("Restarting..."));
-                        Environment.Exit(0);
+                        if (MessageBox.Show("La nouvelle version est prête. Voulez vous l'installer maintenant ?", "Updater", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        {
+                            App.LogStream.Log(new("Installing update..."));
+                            System.Diagnostics.Process.Start("LBDCUpdater-Setup.exe");
+                            App.LogStream.Log(new("Restarting..."));
+                            Environment.Exit(0);
+                        }
                     }
                 }
                 else if (new Version(lastRelease.TagName) < current)
