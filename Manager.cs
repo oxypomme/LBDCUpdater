@@ -214,6 +214,38 @@ namespace LBDCUpdater
                 }
             }
             await ImportFolder(relativeTo);
+            var serverScripts = $"/home/mcftp/server2/scripts";
+            var localScripts = Path.Combine(MinecraftFolder, "scripts");
+            if (!Directory.Exists(localScripts))
+                Directory.CreateDirectory(localScripts);
+            var scripts = await Task.Run(() => client.ListDirectory(serverScripts).Where(s => !s.IsDirectory));
+            count = scripts.Count();
+            nbMod = 1;
+            foreach (var file in scripts)
+            {
+                listProgress?.Invoke(file.Name, nbMod, count);
+                using var localFile = new BufferedStream(new FileStream(Path.Combine(localScripts, file.Name), FileMode.Create, FileAccess.Write), 1024 << 5);
+                long size = await Task.Run(() => client.Get(file.FullName).Length);
+                using var serverFile = await Task.Run(() => client.OpenRead(file.FullName));
+                long writtenBytes = 0;
+                while (writtenBytes < size)
+                {
+                    byte[] bytes = new byte[1024 << 2];
+                    int written = await serverFile.ReadAsync(bytes.AsMemory(0, 1024 << 2), token);
+                    if (token.IsCancellationRequested)
+                    {
+                        localFile.Close();
+                        File.Delete(Path.Combine(localScripts, file.Name));
+                        await CheckModsAsync();
+                        return;
+                    }
+                    localFile.Write(bytes, 0, written);
+                    writtenBytes += written;
+                    dataProgress?.Invoke(file.Name, writtenBytes, size);
+                }
+                localFile.Flush();
+                nbMod++;
+            }
         }
 
         public async Task InitAsync()
