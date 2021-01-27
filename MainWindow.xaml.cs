@@ -79,6 +79,9 @@ namespace LBDCUpdater
                 dialog.ShowDialog();
                 await globalTask;
                 App.LogStream.Log(new LogMessage("Finished updating files."));
+                var configDlMessageResult = MessageBox.Show("Mods mis à jour. Voulez vous lancer le téléchargement des configs ?", "Téléchargement", MessageBoxButton.YesNoCancel);
+                if (configDlMessageResult == MessageBoxResult.Yes)
+                    DownloadConfig();
             }
             catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
         }
@@ -97,7 +100,9 @@ namespace LBDCUpdater
             catch (Exception ex) { App.LogStream.Log(new(ex.ToString(), LogSeverity.Error, ex)); }
         }
 
-        private async void Button_Click_3(object sender, RoutedEventArgs e)
+        private void Button_Click_3(object sender, RoutedEventArgs e) => DownloadConfig();
+
+        private async void DownloadConfig()
         {
             try
             {
